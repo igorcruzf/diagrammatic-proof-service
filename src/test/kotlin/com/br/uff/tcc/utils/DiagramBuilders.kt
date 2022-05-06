@@ -11,25 +11,41 @@ import com.br.uff.tcc.model.ITerm
 import com.br.uff.tcc.model.Node
 import com.br.uff.tcc.model.Term
 
-val inputNode = Node(name = "input", nodeType = NodeTypeEnum.INPUT)
-val outputNode = Node(name = "output", nodeType = NodeTypeEnum.OUTPUT)
+fun atomicDiagram(name: String): Diagram {
+    val inputNode = Node(name = "input", nodeType = NodeTypeEnum.INPUT)
+    val outputNode = Node(name = "output", nodeType = NodeTypeEnum.OUTPUT)
 
-fun atomicDiagram(name: String) = Diagram(nodes = mutableListOf(inputNode, outputNode),
-    edges = mutableListOf(
-        atomicEdge("R")),
-    stepDescription = "")
+    return Diagram(nodes = mutableListOf(inputNode, outputNode),
+        edges = mutableListOf(
+            Edge(leftNode = inputNode,
+                term = AtomicTerm(name),
+                rightNode = outputNode
+            )),
+        stepDescription = "")
+}
 
-fun normalIntersectionDiagram(leftName: String, rightName: String) = Diagram(
-    nodes = mutableListOf(inputNode, outputNode),
-    edges = mutableListOf(
-        atomicEdge(leftName), atomicEdge(rightName)),
-    stepDescription = ""
-)
+fun normalIntersectionDiagram(leftName: String, rightName: String):Diagram {
+    val inputNode = Node(name = "input", nodeType = NodeTypeEnum.INPUT)
+    val outputNode = Node(name = "output", nodeType = NodeTypeEnum.OUTPUT)
 
-fun atomicEdge(name: String) =
-    Edge(leftNode = inputNode, term = AtomicTerm(name), rightNode = outputNode)
+    return Diagram(
+        nodes = mutableListOf(inputNode, outputNode),
+        edges = mutableListOf(
+            Edge(leftNode = inputNode,
+                term = AtomicTerm(leftName),
+                rightNode = outputNode
+            ),
+            Edge(leftNode = inputNode,
+                term = AtomicTerm(rightName),
+                rightNode = outputNode
+            )),
+        stepDescription = ""
+    )
+}
 
 fun buildDiagrammaticProofWithIntersection(leftName: String, rightName: String): DiagrammaticProof {
+    val inputNode = Node(name = "input", nodeType = NodeTypeEnum.INPUT)
+    val outputNode = Node(name = "output", nodeType = NodeTypeEnum.OUTPUT)
 
     return DiagrammaticProof(
         diagrams = mutableListOf(

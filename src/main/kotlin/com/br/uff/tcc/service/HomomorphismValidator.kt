@@ -6,18 +6,21 @@ import com.br.uff.tcc.model.Diagram
 import com.br.uff.tcc.model.Edge
 import com.br.uff.tcc.model.getEdgesWithSpecificNode
 
-class HomomorphismValidator(
-    private val leftDiagram: Diagram,
-    private val rightDiagram: Diagram) {
+class HomomorphismValidator {
+    private lateinit var leftDiagram: Diagram
+    private lateinit var rightDiagram: Diagram
 
-    fun validate() = validate(this.leftDiagram.nodes.first().name, rightDiagram.nodes.first().name)
+    fun validate(leftDiagram: Diagram, rightDiagram: Diagram): Boolean{
+        this.leftDiagram = leftDiagram
+        this.rightDiagram = rightDiagram
+        return validate(leftDiagram.nodes.first().name, rightDiagram.nodes.first().name)
+    }
 
     private fun validate(
         leftDiagramNodeName: String,
         rightDiagramNodeName: String,
         edgesPath: List<Edge>? = null,
     ): Boolean {
-
         return validateEdgesInNode(rightDiagramNodeName, leftDiagramNodeName, position = "LEFT", edgesPath)
                 && validateEdgesInNode(rightDiagramNodeName, leftDiagramNodeName, position = "RIGHT", edgesPath)
     }
@@ -35,28 +38,37 @@ class HomomorphismValidator(
                 edge ->
                     edge.isMapped
                     || edgesPath?.contains(edge) ?: false
-                    || hasAnyValidEdgeInLeftDiagram(leftDiagramEdges, edge, edgesPath)
+                    || isPossibleToMapToLeftDiagram(
+                        leftDiagramEdges = leftDiagramEdges,
+                        rightDiagramEdge = edge,
+                        edgesPath = edgesPath
+                    )
         }
 
         return validEdges == rightDiagramEdges.count()
     }
 
-    private fun hasAnyValidEdgeInLeftDiagram(
+    private fun isPossibleToMapToLeftDiagram(
         leftDiagramEdges: List<Edge>,
         rightDiagramEdge: Edge,
         edgesPath: List<Edge>?,
     ): Boolean {
-        val isMapped = leftDiagramEdges.any{ leftDiagramEdge ->
-            val thisEdgePath = edgesPath?.plus(rightDiagramEdge) ?: listOf(rightDiagramEdge)
+        val newEdgesPath = edgesPath?.plus(rightDiagramEdge) ?: listOf(rightDiagramEdge)
 
-            (leftDiagramEdge.term as AtomicTerm).name == (rightDiagramEdge.term as AtomicTerm).name
-            && validateNodeType(rightDiagramEdge, leftDiagramEdge)
-            && validate(leftDiagramEdge.rightNode.name, rightDiagramEdge.rightNode.name, thisEdgePath)
-            && validate(leftDiagramEdge.leftNode.name, rightDiagramEdge.leftNode.name, thisEdgePath)
+        val possibleEdgeImages = leftDiagramEdges.filter{
+                leftDiagramEdge ->
+                    (leftDiagramEdge.term as AtomicTerm).name == (rightDiagramEdge.term as AtomicTerm).name
+                    && validateNodeType(rightDiagramEdge, leftDiagramEdge)
+                    && validate(leftDiagramEdge.rightNode.name, rightDiagramEdge.rightNode.name, newEdgesPath)
+                    && validate(leftDiagramEdge.leftNode.name, rightDiagramEdge.leftNode.name, newEdgesPath)
         }
 
-        rightDiagramEdge.isMapped = isMapped
-        return isMapped
+        if(possibleEdgeImages.isNotEmpty()){
+            rightDiagramEdge.isMapped = true
+            rightDiagramEdge.leftNode.nodeImageName = possibleEdgeImages.first().leftNode.name
+            rightDiagramEdge.rightNode.nodeImageName = possibleEdgeImages.first().rightNode.name
+        }
+        return possibleEdgeImages.isNotEmpty()
     }
 
     private fun validateNodeType(rightDiagramEdge: Edge, leftDiagramEdge: Edge): Boolean {
