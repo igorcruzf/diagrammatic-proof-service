@@ -16,10 +16,12 @@ repositories {
 }
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter")
+	implementation("org.springframework.boot:spring-boot-starter:2.6.6")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	implementation(group = "com.google.code.gson", name = "gson", version = "2.7")
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
+	testImplementation("org.springframework.boot:spring-boot-starter-test:2.6.6")
 }
 
 tasks.withType<KotlinCompile> {

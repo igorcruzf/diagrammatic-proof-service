@@ -8,4 +8,5 @@ class DiagrammaticProofServiceApplication
 
 fun main(args: Array<String>) {
 	runApplication<DiagrammaticProofServiceApplication>(*args)
+
 }
