@@ -1,6 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    java
+    application
     id("org.springframework.boot") version "2.6.6"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
@@ -8,6 +10,10 @@ plugins {
 
     kotlin("jvm") version "1.6.21"
     kotlin("plugin.spring") version "1.6.21"
+}
+
+application {
+    mainClass.set("uff.br.tcc.DiagrammaticProofServiceApplicationKt")
 }
 
 apply("gradle/jacoco.gradle")
@@ -43,4 +49,9 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.withType<Jar> {
+    archiveBaseName.set("app")
+    archiveVersion.set("0.0.1")
 }

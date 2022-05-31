@@ -7,5 +7,6 @@ import org.springframework.boot.runApplication
 class DiagrammaticProofServiceApplication
 
 fun main(args: Array<String>) {
+    @Suppress("SpreadOperator")
     runApplication<DiagrammaticProofServiceApplication>(*args)
 }
