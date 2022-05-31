@@ -1,25 +1,25 @@
 package uff.br.tcc.model
 
-data class Edge(val leftNode: Node, val rightNode: Node, val term: ITerm, var isMapped: Boolean = false)
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
+
+data class Edge(
+    @JsonProperty("left_node") val leftNode: Node,
+    @JsonProperty("right_node") val rightNode: Node,
+    val term: ITerm,
+
+    @get:JsonIgnore
+    var isMappedInLeftDiagram: Boolean = false
+)
 
 fun MutableList<Edge>.hasAnyNonAtomicTerm(): Boolean {
-    var hasNonAtomicTermFlag = false
-    for(edge in this) {
-        if(edge.term is Term)
-            hasNonAtomicTermFlag = true
+    return this.any {
+        it.term is Term
     }
-    return hasNonAtomicTermFlag
 }
 
 fun MutableList<Edge>.getFirstEdgeWithNonAtomicTerm(): Edge {
-    for(edge in this) {
-        if(edge.term is Term)
-            return edge
+    return this.first {
+        it.term is Term
     }
-
-    throw Exception("Tem que ter pelo menos um termo não atomico")
-}
-
-fun List<Edge>.plus(edge: Edge): List<Edge> {
-    return mutableListOf<Edge>().also { it.addAll(this) && it.add(edge) }
 }

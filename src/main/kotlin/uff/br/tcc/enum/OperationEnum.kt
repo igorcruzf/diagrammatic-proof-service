@@ -1,15 +1,15 @@
 package uff.br.tcc.enum
 
-enum class Operation {
+enum class OperationEnum {
 
     INTERSECTION {
-        override fun symbol() = " ∩"
+        override fun symbol() = "\\cap"
     },
     COMPOSITION {
-        override fun symbol() = " o"
+        override fun symbol() = "\\circ"
     },
     INVERSE {
-        override fun symbol() = "-¹"
+        override fun symbol() = "\\inv"
     };
 
     abstract fun symbol(): String

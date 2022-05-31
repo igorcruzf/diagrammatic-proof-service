@@ -8,7 +8,7 @@ import java.util.UUID
 
 fun Edge.transformInverse(): Edge {
     term as Term
-    return Edge(leftNode = leftNode, rightNode = rightNode, term = term.leftTerm)
+    return Edge(leftNode = rightNode, rightNode = leftNode, term = term.leftTerm)
 }
 
 fun Edge.transformComposition(): Triple<Edge, Edge, Node> {

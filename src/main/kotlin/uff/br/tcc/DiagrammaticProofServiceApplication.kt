@@ -7,6 +7,5 @@ import org.springframework.boot.runApplication
 class DiagrammaticProofServiceApplication
 
 fun main(args: Array<String>) {
-	runApplication<DiagrammaticProofServiceApplication>(*args)
-
+    runApplication<DiagrammaticProofServiceApplication>(*args)
 }

@@ -1,23 +1,19 @@
 package uff.br.tcc
 
-import uff.br.tcc.model.Diagram
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import uff.br.tcc.service.DiagramService
 
 @RestController
 @RequestMapping("/diagrams")
-class DiagrammaticProofController {
+class DiagrammaticProofController(
+    @Autowired val diagramService: DiagramService
+) {
 
-//    @GetMapping("/validate-homomorphism")
-//    fun validateHomomorphism(@RequestBody diagrams: String) {
-//        val (leftDiagram, rightDiagram) = diagrams.toDiagramPair()
-//    }
-
-//    private fun String.toDiagramPair(): Pair<Diagram, Diagram> {
-//        val diagrams = split("\\subseteq")
-//        if(diagrams.count() != 2) throw Exception("Tem que ter dois diagramas")
-//        return Pair(Diagram(), Diagram())
-//    }
+    @GetMapping("/validate-homomorphism")
+    fun validateHomomorphism(@RequestParam expression: String) =
+        diagramService.transformDiagramsAndValidateHomomorphism(expression)
 }

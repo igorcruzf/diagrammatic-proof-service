@@ -1,80 +1,89 @@
 package uff.br.tcc.service
 
+import org.springframework.stereotype.Component
 import uff.br.tcc.enum.NodeTypeEnum
-import uff.br.tcc.model.AtomicTerm
 import uff.br.tcc.model.Diagram
 import uff.br.tcc.model.Edge
 import uff.br.tcc.model.getEdgesWithSpecificNode
 
+@Component
 class HomomorphismValidator {
     private lateinit var leftDiagram: Diagram
     private lateinit var rightDiagram: Diagram
 
-    fun validate(leftDiagram: Diagram, rightDiagram: Diagram): Boolean{
+    fun validate(leftDiagram: Diagram, rightDiagram: Diagram): Boolean {
         this.leftDiagram = leftDiagram
         this.rightDiagram = rightDiagram
-        return validate(leftDiagram.nodes.first().name, rightDiagram.nodes.first().name)
+        return isNodeImageToRightDiagramNode(leftDiagram.nodes.first().name, rightDiagram.nodes.first().name)
     }
 
-    private fun validate(
+    private fun isNodeImageToRightDiagramNode(
         leftDiagramNodeName: String,
         rightDiagramNodeName: String,
-        edgesPath: List<Edge>? = null,
-    ): Boolean {
-        return validateEdgesInNode(rightDiagramNodeName, leftDiagramNodeName, position = "LEFT", edgesPath)
-                && validateEdgesInNode(rightDiagramNodeName, leftDiagramNodeName, position = "RIGHT", edgesPath)
-    }
+        edgesPath: List<Edge> = emptyList(),
+    ) = isAllEdgesInSameNodeValid(rightDiagramNodeName, leftDiagramNodeName, position = "LEFT", edgesPath) &&
+        isAllEdgesInSameNodeValid(rightDiagramNodeName, leftDiagramNodeName, position = "RIGHT", edgesPath)
 
-    private fun validateEdgesInNode(
+    private fun isAllEdgesInSameNodeValid(
         rightDiagramNodeName: String,
         leftDiagramNodeName: String,
         position: String,
-        edgesPath: List<Edge>?,
+        edgesPath: List<Edge>,
     ): Boolean {
         val rightDiagramEdges = rightDiagram.getEdgesWithSpecificNode(nodeName = rightDiagramNodeName, position = position)
         val leftDiagramEdges = leftDiagram.getEdgesWithSpecificNode(nodeName = leftDiagramNodeName, position = position)
 
-        val validEdges = rightDiagramEdges.count {
-                edge ->
-                    edge.isMapped
-                    || edgesPath?.contains(edge) ?: false
-                    || isPossibleToMapToLeftDiagram(
-                        leftDiagramEdges = leftDiagramEdges,
-                        rightDiagramEdge = edge,
-                        edgesPath = edgesPath
-                    )
+        val validEdges = rightDiagramEdges.filter { edge ->
+            edge.isMappedInLeftDiagram ||
+                edgesPath.contains(edge) ||
+                canMapEdgeToLeftDiagram(
+                    leftDiagramEdges = leftDiagramEdges,
+                    rightDiagramEdge = edge,
+                    edgesPath = edgesPath
+                )
         }
-
-        return validEdges == rightDiagramEdges.count()
+        return validEdges == rightDiagramEdges
     }
 
-    private fun isPossibleToMapToLeftDiagram(
+    private fun canMapEdgeToLeftDiagram(
         leftDiagramEdges: List<Edge>,
         rightDiagramEdge: Edge,
-        edgesPath: List<Edge>?,
+        edgesPath: List<Edge>,
     ): Boolean {
-        val newEdgesPath = edgesPath?.plus(rightDiagramEdge) ?: listOf(rightDiagramEdge)
-
-        val possibleEdgeImages = leftDiagramEdges.filter{
-                leftDiagramEdge ->
-                    (leftDiagramEdge.term as AtomicTerm).name == (rightDiagramEdge.term as AtomicTerm).name
-                    && validateNodeType(rightDiagramEdge, leftDiagramEdge)
-                    && validate(leftDiagramEdge.rightNode.name, rightDiagramEdge.rightNode.name, newEdgesPath)
-                    && validate(leftDiagramEdge.leftNode.name, rightDiagramEdge.leftNode.name, newEdgesPath)
-        }
-
-        if(possibleEdgeImages.isNotEmpty()){
-            rightDiagramEdge.isMapped = true
-            rightDiagramEdge.leftNode.nodeImageName = possibleEdgeImages.first().leftNode.name
-            rightDiagramEdge.rightNode.nodeImageName = possibleEdgeImages.first().rightNode.name
-        }
+        val possibleEdgeImages = getAllPossibleEdgeImages(leftDiagramEdges, rightDiagramEdge, edgesPath)
         return possibleEdgeImages.isNotEmpty()
+            .also { isNotEmpty ->
+                if (isNotEmpty) {
+                    rightDiagramEdge.isMappedInLeftDiagram = true
+                    rightDiagramEdge.leftNode.imageName = possibleEdgeImages.first().leftNode.name
+                    rightDiagramEdge.rightNode.imageName = possibleEdgeImages.first().rightNode.name
+                }
+            }
     }
 
-    private fun validateNodeType(rightDiagramEdge: Edge, leftDiagramEdge: Edge): Boolean {
-        return (rightDiagramEdge.leftNode.nodeType == leftDiagramEdge.leftNode.nodeType
-                        || rightDiagramEdge.leftNode.nodeType == NodeTypeEnum.INTERMEDIATE)
-                && (rightDiagramEdge.rightNode.nodeType == leftDiagramEdge.rightNode.nodeType
-                        || rightDiagramEdge.rightNode.nodeType == NodeTypeEnum.INTERMEDIATE)
+    private fun getAllPossibleEdgeImages(
+        leftDiagramEdges: List<Edge>,
+        rightDiagramEdge: Edge,
+        edgesPath: List<Edge>,
+    ): List<Edge> {
+        val newEdgesPath = edgesPath.plus(rightDiagramEdge)
+        return leftDiagramEdges.filter { edge ->
+            edge.term.name() == rightDiagramEdge.term.name() &&
+                isNodesTypeValid(rightDiagramEdge, edge) &&
+                isNodeImageToRightDiagramNode(edge.rightNode.name, rightDiagramEdge.rightNode.name, newEdgesPath) &&
+                isNodeImageToRightDiagramNode(edge.leftNode.name, rightDiagramEdge.leftNode.name, newEdgesPath)
+        }
     }
+
+    private fun isNodesTypeValid(
+        rightDiagramEdge: Edge,
+        leftDiagramEdge: Edge
+    ) = isNodeTypeValid(rightDiagramEdge.leftNode.type, leftDiagramEdge.leftNode.type) &&
+        isNodeTypeValid(rightDiagramEdge.rightNode.type, leftDiagramEdge.rightNode.type)
+
+    private fun isNodeTypeValid(
+        rightDiagramEdgeNodeType: NodeTypeEnum,
+        leftDiagramEdgeNodeType: NodeTypeEnum
+    ) = rightDiagramEdgeNodeType == NodeTypeEnum.INTERMEDIATE ||
+        rightDiagramEdgeNodeType == leftDiagramEdgeNodeType
 }

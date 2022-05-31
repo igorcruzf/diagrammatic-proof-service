@@ -1,6 +1,5 @@
 package uff.br.tcc.helper
 
-import uff.br.tcc.model.ITerm
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializationContext
@@ -10,8 +9,8 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
+import uff.br.tcc.model.ITerm
 import java.lang.reflect.Type
-
 
 fun buildGson(): Gson = GsonBuilder().registerTypeAdapter(ITerm::class.java, InterfaceAdapter<ITerm>())
     .create()

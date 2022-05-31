@@ -1,12 +1,16 @@
 package uff.br.tcc.model
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import uff.br.tcc.helper.buildGson
 import java.util.stream.Collectors
 
-
 data class DiagrammaticProof(val diagrams: MutableList<Diagram>)
 
-data class Diagram(val nodes: MutableList<Node>, val edges: MutableList<Edge>, var stepDescription: String)
+data class Diagram(
+    val nodes: MutableList<Node>,
+    val edges: MutableList<Edge>,
+    @JsonProperty("step_description") var stepDescription: String
+)
 
 fun Diagram.deepCopy(): Diagram {
     val gson = buildGson()
@@ -15,7 +19,7 @@ fun Diagram.deepCopy(): Diagram {
 
 fun Diagram.getEdgesWithSpecificNode(nodeName: String, position: String): MutableList<Edge> =
     edges.stream().filter {
-        nodeName == when(position) {
+        nodeName == when (position) {
             "LEFT" -> it.leftNode.name
             else -> it.rightNode.name
         }
