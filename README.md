@@ -62,6 +62,6 @@ Cada objeto tem uma lista de diagramas e cada diagrama possui:
 O último diagrama de cada diagrammatic_proof é o diagrama na forma normal em que não há mais operações a serem transformadas.
 
 Se houver homomorfismo, cada nó no diagrama normal do "right_diagrammatic_proof" possuirá
-um atributo "node_image" com o nome do nó no diagrama normal do "left_diagrammatic_proof" que é a imagem
+um atributo "image_name" com o nome do nó no diagrama normal do "left_diagrammatic_proof" que é a imagem
 dele.
 
