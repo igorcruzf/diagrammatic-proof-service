@@ -40,7 +40,10 @@ class DiagramServiceTest {
 
         assertEquals(normalCompositionDiagram.edges.first().term, lastStepDiagram.edges.first().term)
         assertEquals(normalCompositionDiagram.edges.first().leftNode, lastStepDiagram.edges.first().leftNode)
-        assertEquals(normalCompositionDiagram.edges.first().rightNode.type, lastStepDiagram.edges.first().rightNode.type)
+        assertEquals(
+            normalCompositionDiagram.edges.first().rightNode.type,
+            lastStepDiagram.edges.first().rightNode.type
+        )
         assertEquals(normalCompositionDiagram.edges.last().term, lastStepDiagram.edges.last().term)
         assertEquals(normalCompositionDiagram.edges.last().leftNode.type, lastStepDiagram.edges.last().leftNode.type)
         assertEquals(normalCompositionDiagram.edges.last().rightNode, lastStepDiagram.edges.last().rightNode)
@@ -57,7 +60,7 @@ class DiagramServiceTest {
     }
 
     @Test
-    fun `should transform expression in two diagrammatic proofs with normal diagrams and should be homomorphic in both directions`() {
+    fun `should transform expression in two diagrammatic proofs with normaldiagrams and should be homomorphic in both directions`() {
         val expression = "(R \\circ S)\\cap T \\subseteq ((R \\cap(T \\circ (S\\inv))) \\circ (((R\\inv) \\circ T) \\cap S)) \\cap T"
         val diagrammaticProofResponse = diagramService.transformDiagramsAndValidateHomomorphism(expression)
         assertTrue(diagrammaticProofResponse.isHomomorphic)

@@ -30,8 +30,14 @@ class HomomorphismValidator {
         position: String,
         edgesPath: List<Edge>,
     ): Boolean {
-        val rightDiagramEdges = rightDiagram.getEdgesWithSpecificNode(nodeName = rightDiagramNodeName, position = position)
-        val leftDiagramEdges = leftDiagram.getEdgesWithSpecificNode(nodeName = leftDiagramNodeName, position = position)
+        val rightDiagramEdges = rightDiagram.getEdgesWithSpecificNode(
+            nodeName = rightDiagramNodeName,
+            position = position
+        )
+        val leftDiagramEdges = leftDiagram.getEdgesWithSpecificNode(
+            nodeName = leftDiagramNodeName,
+            position = position
+        )
 
         val validEdges = rightDiagramEdges.filter { edge ->
             edge.isMappedInLeftDiagram ||

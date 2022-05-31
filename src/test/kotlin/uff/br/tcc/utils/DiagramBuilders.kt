@@ -149,11 +149,17 @@ fun buildEdgeWithInverse(inputNode: Node, outputNode: Node, name: String) = Edge
 fun buildEdgeWithComposition(inputNode: Node, outputNode: Node, leftName: String, rightName: String) = Edge(
     leftNode = inputNode,
     rightNode = outputNode,
-    term = NonAtomicTerm(leftTerm = AtomicTerm(leftName), operation = OperationEnum.COMPOSITION, rightTerm = AtomicTerm(rightName))
+    term = NonAtomicTerm(
+        leftTerm = AtomicTerm(leftName), operation = OperationEnum.COMPOSITION,
+        rightTerm = AtomicTerm(rightName)
+    )
 )
 
 fun buildEdgeWithIntersection(inputNode: Node, outputNode: Node, leftName: String, rightName: String) = Edge(
     leftNode = inputNode,
     rightNode = outputNode,
-    term = NonAtomicTerm(leftTerm = AtomicTerm(leftName), operation = OperationEnum.INTERSECTION, rightTerm = AtomicTerm(rightName))
+    term = NonAtomicTerm(
+        leftTerm = AtomicTerm(leftName), operation = OperationEnum.INTERSECTION,
+        rightTerm = AtomicTerm(rightName)
+    )
 )

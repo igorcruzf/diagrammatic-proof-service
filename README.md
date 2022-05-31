@@ -6,7 +6,7 @@ se a inclusão é verdadeira ou não.
 
 ## Como executar
 
-Para executar a aplicação é necessário ter java 11 configurado na máquina e rodar o comando
+Para executar a aplicação é necessário ter java 17 configurado na máquina e rodar o comando
 ``.\gradlew bootRun`` na raiz do projeto.
 
 ## Endpoint
