@@ -2,12 +2,12 @@ apply plugin: 'jacoco'
 
 
 def coverageLimits = [
-        'instruction': 79.06,
-        'branch': 78.57,
-        'line': 79.72,
-        'complexity': 77.23,
-        'method': 81.94,
-        'class': 90.00
+        'instruction': 80.00,
+        'branch': 80.00,
+        'line': 80.00,
+        'complexity': 80.00,
+        'method': 80.00,
+        'class': 80.00
 ]
 
 jacoco {
@@ -22,6 +22,11 @@ jacocoTestReport {
     }
 
     project.ext.exclusions = [
+            'src/main/kotlin/uff/br/tcc/DiagrammaticProofServiceApplication*',
+            'src/main/kotlin/uff/br/tcc/helper/**',
+            'src/main/kotlin/uff/br/tcc/enum/**',
+            'src/main/kotlin/uff/br/tcc/model/**',
+            'src/main/kotlin/uff/br/tcc/DiagrammaticProofController*'
     ]
 
     project.ext.exclusionsForJaCoCo = project.ext.exclusions.collect({

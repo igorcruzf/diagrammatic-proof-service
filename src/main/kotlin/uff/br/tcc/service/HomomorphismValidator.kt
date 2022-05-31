@@ -2,9 +2,9 @@ package uff.br.tcc.service
 
 import org.springframework.stereotype.Component
 import uff.br.tcc.enum.NodeTypeEnum
+import uff.br.tcc.extensions.getEdgesWithSpecificNode
 import uff.br.tcc.model.Diagram
 import uff.br.tcc.model.Edge
-import uff.br.tcc.model.getEdgesWithSpecificNode
 
 @Component
 class HomomorphismValidator {
@@ -54,11 +54,21 @@ class HomomorphismValidator {
         return possibleEdgeImages.isNotEmpty()
             .also { isNotEmpty ->
                 if (isNotEmpty) {
-                    rightDiagramEdge.isMappedInLeftDiagram = true
-                    rightDiagramEdge.leftNode.imageName = possibleEdgeImages.first().leftNode.name
-                    rightDiagramEdge.rightNode.imageName = possibleEdgeImages.first().rightNode.name
+                    addImageInNodes(rightDiagramEdge, possibleEdgeImages.first())
                 }
             }
+    }
+
+    private fun addImageInNodes(rightDiagramEdge: Edge, edgeImage: Edge) {
+        rightDiagramEdge.isMappedInLeftDiagram = true
+        rightDiagram.nodes
+            .first {
+                it.name == rightDiagramEdge.leftNode.name
+            }.imageName = edgeImage.leftNode.name
+        rightDiagram.nodes
+            .first {
+                it.name == rightDiagramEdge.rightNode.name
+            }.imageName = edgeImage.rightNode.name
     }
 
     private fun getAllPossibleEdgeImages(

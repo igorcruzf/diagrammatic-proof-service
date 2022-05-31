@@ -3,13 +3,12 @@ package uff.br.tcc.utils
 import uff.br.tcc.enum.NodeTypeEnum
 import uff.br.tcc.enum.OperationEnum
 import uff.br.tcc.enum.StepDescriptionEnum
-import uff.br.tcc.model.AtomicTerm
 import uff.br.tcc.model.Diagram
 import uff.br.tcc.model.DiagrammaticProof
 import uff.br.tcc.model.Edge
-import uff.br.tcc.model.ITerm
 import uff.br.tcc.model.Node
-import uff.br.tcc.model.Term
+import uff.br.tcc.model.term.AtomicTerm
+import uff.br.tcc.model.term.NonAtomicTerm
 
 fun atomicDiagram(name: String): Diagram {
     val inputNode = Node(name = "input", type = NodeTypeEnum.INPUT)
@@ -22,6 +21,23 @@ fun atomicDiagram(name: String): Diagram {
                 leftNode = inputNode,
                 term = AtomicTerm(name),
                 rightNode = outputNode
+            )
+        ),
+        stepDescription = ""
+    )
+}
+
+fun normalInverseDiagram(name: String): Diagram {
+    val inputNode = Node(name = "input", type = NodeTypeEnum.INPUT)
+    val outputNode = Node(name = "output", type = NodeTypeEnum.OUTPUT)
+
+    return Diagram(
+        nodes = mutableListOf(inputNode, outputNode),
+        edges = mutableListOf(
+            Edge(
+                leftNode = outputNode,
+                term = AtomicTerm(name),
+                rightNode = inputNode
             )
         ),
         stepDescription = ""
@@ -50,6 +66,63 @@ fun normalIntersectionDiagram(leftName: String, rightName: String): Diagram {
     )
 }
 
+fun normalCompositionDiagram(leftName: String, rightName: String): Diagram {
+    val inputNode = Node(name = "input", type = NodeTypeEnum.INPUT)
+    val intermediateNode = Node("a", type = NodeTypeEnum.INTERMEDIATE)
+    val outputNode = Node(name = "output", type = NodeTypeEnum.OUTPUT)
+
+    return Diagram(
+        nodes = mutableListOf(inputNode, outputNode),
+        edges = mutableListOf(
+            Edge(
+                leftNode = inputNode,
+                term = AtomicTerm(leftName),
+                rightNode = intermediateNode
+            ),
+            Edge(
+                leftNode = intermediateNode,
+                term = AtomicTerm(rightName),
+                rightNode = outputNode
+            )
+        ),
+        stepDescription = ""
+    )
+}
+
+fun buildDiagrammaticProofWithInverse(name: String): DiagrammaticProof {
+    val inputNode = Node(name = "input", type = NodeTypeEnum.INPUT)
+    val outputNode = Node(name = "output", type = NodeTypeEnum.OUTPUT)
+
+    return DiagrammaticProof(
+        diagrams = mutableListOf(
+            Diagram(
+                nodes = mutableListOf(inputNode, outputNode),
+                edges = mutableListOf(
+                    buildEdgeWithInverse(inputNode, outputNode, name)
+                ),
+                stepDescription = StepDescriptionEnum.BEGIN.name
+            )
+        )
+    )
+}
+
+fun buildDiagrammaticProofWithComposition(leftName: String, rightName: String): DiagrammaticProof {
+    val inputNode = Node(name = "input", type = NodeTypeEnum.INPUT)
+    val outputNode = Node(name = "output", type = NodeTypeEnum.OUTPUT)
+
+    return DiagrammaticProof(
+        diagrams = mutableListOf(
+            Diagram(
+                nodes = mutableListOf(inputNode, outputNode),
+                edges = mutableListOf(
+                    buildEdgeWithComposition(inputNode, outputNode, leftName, rightName)
+                ),
+                stepDescription = StepDescriptionEnum.BEGIN.name
+            )
+        )
+    )
+}
+
 fun buildDiagrammaticProofWithIntersection(leftName: String, rightName: String): DiagrammaticProof {
     val inputNode = Node(name = "input", type = NodeTypeEnum.INPUT)
     val outputNode = Node(name = "output", type = NodeTypeEnum.OUTPUT)
@@ -67,68 +140,20 @@ fun buildDiagrammaticProofWithIntersection(leftName: String, rightName: String):
     )
 }
 
-fun buildDiagrammaticProof2(): DiagrammaticProof {
-    val inputNode = Node(name = "input", type = NodeTypeEnum.INPUT)
-    val outputNode = Node(name = "output", type = NodeTypeEnum.OUTPUT)
-    return DiagrammaticProof(
-        diagrams = mutableListOf(
-            Diagram(
-                nodes = mutableListOf(inputNode, outputNode),
-                edges = mutableListOf(
-                    buildEdge2(inputNode, outputNode)
-                ),
-                stepDescription = StepDescriptionEnum.BEGIN.name
-            )
-        )
-    )
-}
+fun buildEdgeWithInverse(inputNode: Node, outputNode: Node, name: String) = Edge(
+    leftNode = inputNode,
+    rightNode = outputNode,
+    term = NonAtomicTerm(leftTerm = AtomicTerm(name), operation = OperationEnum.INVERSE)
+)
 
-fun buildDiagrammaticProof(): DiagrammaticProof {
-    val inputNode = Node(name = "input", type = NodeTypeEnum.INPUT)
-    val outputNode = Node(name = "output", type = NodeTypeEnum.OUTPUT)
-    return DiagrammaticProof(
-        diagrams = mutableListOf(
-            Diagram(
-                nodes = mutableListOf(inputNode, outputNode),
-                edges = mutableListOf(
-                    buildEdge(inputNode, outputNode)
-                ),
-                stepDescription = StepDescriptionEnum.BEGIN.name
-            )
-        )
-    )
-}
+fun buildEdgeWithComposition(inputNode: Node, outputNode: Node, leftName: String, rightName: String) = Edge(
+    leftNode = inputNode,
+    rightNode = outputNode,
+    term = NonAtomicTerm(leftTerm = AtomicTerm(leftName), operation = OperationEnum.COMPOSITION, rightTerm = AtomicTerm(rightName))
+)
 
 fun buildEdgeWithIntersection(inputNode: Node, outputNode: Node, leftName: String, rightName: String) = Edge(
     leftNode = inputNode,
     rightNode = outputNode,
-    term = Term(leftTerm = AtomicTerm(leftName), operation = OperationEnum.INTERSECTION, rightTerm = AtomicTerm(rightName))
-)
-
-fun buildEdge2(inputNode: Node, outputNode: Node) = Edge(
-    leftNode = inputNode,
-    rightNode = outputNode,
-    term = AtomicTerm("R")
-)
-
-fun buildEdge(inputNode: Node, outputNode: Node) = Edge(
-    leftNode = inputNode,
-    rightNode = outputNode,
-    term = buildTermWithTwoNonAtomicsTerms()
-)
-
-fun buildTermWithTwoNonAtomicsTerms(): Term {
-    val leftTerm = buildTerm(rightTerm = null, operationEnum = OperationEnum.INVERSE)
-    val rightTerm = buildTerm(operationEnum = OperationEnum.COMPOSITION)
-    return buildTerm(leftTerm = leftTerm, rightTerm = rightTerm)
-}
-
-fun buildTerm(
-    leftTerm: ITerm = AtomicTerm("A"),
-    operationEnum: OperationEnum = OperationEnum.INTERSECTION,
-    rightTerm: ITerm? = AtomicTerm("B"),
-) = Term(
-    leftTerm = leftTerm,
-    operation = operationEnum,
-    rightTerm = rightTerm
+    term = NonAtomicTerm(leftTerm = AtomicTerm(leftName), operation = OperationEnum.INTERSECTION, rightTerm = AtomicTerm(rightName))
 )

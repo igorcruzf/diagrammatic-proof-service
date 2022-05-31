@@ -2,10 +2,10 @@ package uff.br.tcc.service
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import uff.br.tcc.extensions.deepCopy
+import uff.br.tcc.extensions.hasAnyNonAtomicTerm
 import uff.br.tcc.model.DiagrammaticProof
 import uff.br.tcc.model.DiagrammaticProofResponse
-import uff.br.tcc.model.deepCopy
-import uff.br.tcc.model.hasAnyNonAtomicTerm
 import uff.br.tcc.transformer.DiagramTransformer
 import uff.br.tcc.transformer.RequestTransformer
 
@@ -16,12 +16,8 @@ class DiagramService(
     @Autowired private val homomorphismValidator: HomomorphismValidator
 ) {
 
-    companion object {
-        const val SUB_SET_EQUALS = "\\subseteq"
-    }
-
     fun transformDiagramsAndValidateHomomorphism(diagramsRequest: String): DiagrammaticProofResponse {
-        val diagrams = diagramsRequest.splitToDiagrams()
+        val diagrams = requestTransformer.splitToDiagrams(diagramsRequest)
         val leftDiagrammaticProof = requestTransformer.transformToDiagrammaticProof(diagrams.first())
         val rightDiagrammaticProof = requestTransformer.transformToDiagrammaticProof(diagrams.last())
 
@@ -38,14 +34,6 @@ class DiagramService(
             rightDiagrammaticProof = rightDiagrammaticProof,
             isHomomorphic = isHomomorphic
         )
-    }
-
-    fun String.splitToDiagrams(): List<String> {
-        val diagrams = this.split(SUB_SET_EQUALS)
-        if (diagrams.count() != 2) {
-            throw Exception("Erro + ${diagrams[0]}")
-        }
-        return diagrams
     }
 
     fun addDiagramsUntilNormalForm(diagrammaticProof: DiagrammaticProof) {

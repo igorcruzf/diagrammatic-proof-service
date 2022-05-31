@@ -4,16 +4,28 @@ import org.springframework.stereotype.Component
 import uff.br.tcc.enum.NodeTypeEnum
 import uff.br.tcc.enum.OperationEnum
 import uff.br.tcc.enum.StepDescriptionEnum
-import uff.br.tcc.model.AtomicTerm
 import uff.br.tcc.model.Diagram
 import uff.br.tcc.model.DiagrammaticProof
 import uff.br.tcc.model.Edge
-import uff.br.tcc.model.ITerm
 import uff.br.tcc.model.Node
-import uff.br.tcc.model.Term
+import uff.br.tcc.model.term.AtomicTerm
+import uff.br.tcc.model.term.ITerm
+import uff.br.tcc.model.term.NonAtomicTerm
 
 @Component
 class RequestTransformer {
+
+    companion object {
+        const val SUB_SET_EQUALS = "\\subseteq"
+    }
+
+    fun splitToDiagrams(expression: String): List<String> {
+        val diagrams = expression.split(SUB_SET_EQUALS)
+        if (diagrams.count() != 2) {
+            throw IllegalArgumentException("Should have 1 inclusion in expression but has ${diagrams.count() - 1}")
+        }
+        return diagrams
+    }
 
     fun transformToDiagrammaticProof(diagramStringRequest: String): DiagrammaticProof {
         val inputNode = Node("input", NodeTypeEnum.INPUT)
@@ -25,7 +37,7 @@ class RequestTransformer {
                     edges = mutableListOf(
                         Edge(
                             leftNode = inputNode,
-                            term = diagramStringRequest.transformToTerms(),
+                            term = transformToTerms(diagramStringRequest.filter { !it.isWhitespace() }),
                             rightNode = outputNode
                         )
                     ),
@@ -35,14 +47,14 @@ class RequestTransformer {
         )
     }
 
-    private fun String.containsAnyOperator() =
+    fun containsAnyOperator(expression: String) =
         OperationEnum.values().any {
-            this.contains(it.symbol())
+            expression.contains(it.symbol())
         }
 
-    private fun String.getFirstOperator(): OperationEnum? {
+    fun getFirstOperation(expression: String): OperationEnum? {
         return OperationEnum.values().map {
-            it to this.indexOf(it.symbol())
+            it to expression.indexOf(it.symbol())
         }.sortedBy {
             it.second
         }.firstOrNull {
@@ -50,27 +62,48 @@ class RequestTransformer {
         }?.first
     }
 
-    fun String.transformToTerms(): ITerm {
-        val term = if (this.first() == '(') {
-            transformTermInParenthesis()
+    fun transformToTerms(expression: String): ITerm {
+        val term = if (expression.first() == '(') {
+            transformTermInParenthesis(expression)
         } else {
-            splitInTerms(this)
+            splitInTerms(expression)
         }
         return term
     }
 
-    private fun String.transformTermInParenthesis(): ITerm {
-        val leftParenthesisIndex = this.lastIndexOf(')')
-        val leftTerm = this.take(leftParenthesisIndex).drop(1)
-        val operationAndRightTerm = getOperationAndRightTerm(leftParenthesisIndex)
-        val operation = operationAndRightTerm?.getFirstOperator()
+    fun getIndexOfLeftParenthesis(expression: String): Int {
+        var rightParenthesisCount = 1
+        var leftParenthesisIndex = 1
+        expression.drop(1).takeWhile {
+            if (it == '(') {
+                rightParenthesisCount += 1
+            }
+            if (it == ')') {
+                rightParenthesisCount -= 1
+            }
+            if (rightParenthesisCount != 0) {
+                leftParenthesisIndex += 1
+            }
+            rightParenthesisCount != 0
+        }
+
+        return leftParenthesisIndex
+    }
+
+    fun transformTermInParenthesis(expression: String): ITerm {
+        val leftParenthesisIndex = getIndexOfLeftParenthesis(expression)
+        val leftTerm = expression.take(leftParenthesisIndex).drop(1)
+        val operationAndRightTerm = getOperationAndRightTerm(expression, leftParenthesisIndex)
+        val operation = operationAndRightTerm?.let {
+            getFirstOperation(operationAndRightTerm)
+        }
         return operation?.let {
             val rightTerm = getRightTerm(operationAndRightTerm, operation)
             transformToNonAtomicTerm(leftTerm, operation, rightTerm)
-        } ?: splitInTerms(leftTerm)
+        } ?: transformToTerms(leftTerm)
     }
 
-    private fun getRightTerm(
+    fun getRightTerm(
         operationAndRightTerm: String,
         operation: OperationEnum,
     ) = operationAndRightTerm
@@ -79,33 +112,43 @@ class RequestTransformer {
             null
         }
 
-    private fun String.getOperationAndRightTerm(leftParenthesisIndex: Int): String? {
-        val operationAndRightTerm = if (this.length != leftParenthesisIndex + 1) {
-            this.removeRange(0..leftParenthesisIndex)
+    fun getOperationAndRightTerm(expression: String, leftParenthesisIndex: Int): String? {
+        val operationAndRightTerm = if (expression.length != leftParenthesisIndex + 1) {
+            expression.removeRange(0..leftParenthesisIndex)
         } else null
         return operationAndRightTerm
     }
 
     private fun splitInTerms(term: String): ITerm {
-        val operator = term.getFirstOperator()
+        val operator = getFirstOperation(term)
         return operator?.let {
             val (leftTerm, rightTerm) = term.split(operator.symbol(), limit = 2)
             transformToNonAtomicTerm(leftTerm, operator, rightTerm)
-        } ?: term.transformToAtomicTerm()
+        } ?: transformToAtomicTerm(term)
     }
 
-    fun String.transformToAtomicTerm() = AtomicTerm(
-        this.replace("(", "").replace(")", "")
+    fun transformToAtomicTerm(expression: String) = AtomicTerm(
+        expression.replace("(", "").replace(")", "")
     )
 
-    fun String.transformToTerm() =
-        if (this.containsAnyOperator()) {
-            this.transformToTerms()
+    private fun transformToTerm(expression: String) =
+        if (containsAnyOperator(expression)) {
+            transformToTerms(expression)
         } else {
-            this.transformToAtomicTerm()
+            transformToAtomicTerm(expression)
         }
 
-    fun transformToNonAtomicTerm(leftTerm: String, operationEnum: OperationEnum, rightTerm: String?): Term {
-        return Term(leftTerm.transformToTerm(), operationEnum, rightTerm?.transformToTerm())
+    fun transformToNonAtomicTerm(leftTerm: String, operationEnum: OperationEnum, rightTerm: String?): NonAtomicTerm {
+        return NonAtomicTerm(
+            transformToTerm(leftTerm),
+            operationEnum,
+            rightTerm?.let {
+                if (rightTerm.isEmpty()) {
+                    null
+                } else {
+                    transformToTerm(rightTerm)
+                }
+            }
+        )
     }
 }

@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import uff.br.tcc.enum.NodeTypeEnum
-import uff.br.tcc.model.AtomicTerm
 import uff.br.tcc.model.Diagram
 import uff.br.tcc.model.Edge
 import uff.br.tcc.model.Node
+import uff.br.tcc.model.term.AtomicTerm
 import uff.br.tcc.utils.atomicDiagram
 import uff.br.tcc.utils.normalIntersectionDiagram
 
