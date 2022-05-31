@@ -1,21 +1,21 @@
-##Objetivo
+## Objetivo
 Essa API tem como objetivo transformar diagramas para cálculo por grafo e
 verificar se há homomorfismo entre os diagramas, com objetivo de verificar
 se a inclusão é verdadeira ou não.
 
 
-##Como executar
+## Como executar
 
 Para executar a aplicação é necessário ter java 11 configurado na máquina e rodar o comando
 ``.\gradlew bootRun`` na raiz do projeto.
 
-##Endpoint
+## Endpoint
 
-###/diagrams/validate-homomorphism?expression={{expression}}
+### /diagrams/validate-homomorphism?expression={{expression}}
 
-###Exemplo:
+### Exemplo:
     curl --location --request GET 'localhost:8080/diagrams/validate-homomorphism?expression=(A%5CcapB)%5Cinv%5Csubseteq(A%5CcapB)%5Cinv'
-####Entrada:
+#### Entrada:
     
 Uma expressão de subconjunto por exemplo:
   
@@ -35,7 +35,7 @@ Uma expressão de subconjunto por exemplo:
   - A%5Ccap(B%5Cinv)
   - ((A%5CcapB)%5Cinv)
 
-####Saída:
+#### Saída:
 
 A saída é a informação se existe ou não homomorfismo e 
 dois objetos "diagrammatic_proof", um para o
