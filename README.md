@@ -14,7 +14,7 @@ Para executar a aplicação é necessário ter java 17 configurado na máquina e
 ### /diagrams/validate-homomorphism?expression={{expression}}
 
 ### Exemplo:
-    curl --location --request GET 'localhost:8080/diagrams/validate-homomorphism?expression=(AintB)invinc(AintB)inv'
+    curl --location --request GET 'https://diagrammatic-proof-service.herokuapp.com/diagrams/validate-homomorphism?expression=(AintB)inv%20inc%20(A%20int%20B)%20inv'
 #### Entrada:
     
 Uma expressão de subconjunto por exemplo:

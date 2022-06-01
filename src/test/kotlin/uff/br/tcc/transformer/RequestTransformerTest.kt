@@ -149,7 +149,7 @@ class RequestTransformerTest {
         val expression = "(AintB)compC"
         assertEquals(
             "compC",
-            requestTransformer.getOperationAndRightTerm(expression, expression.length-6)
+            requestTransformer.getOperationAndRightTerm(expression, expression.length - 6)
         )
     }
 
@@ -158,14 +158,14 @@ class RequestTransformerTest {
         val expression = "(AintB)inv"
         assertEquals(
             "inv",
-            requestTransformer.getOperationAndRightTerm(expression, expression.length-4)
+            requestTransformer.getOperationAndRightTerm(expression, expression.length - 4)
         )
     }
 
     @Test
     fun `should return null in get operation and right term with nothing after left parenthesis`() {
         val expression = "(AintB)"
-        assertNull(requestTransformer.getOperationAndRightTerm(expression, expression.length-1))
+        assertNull(requestTransformer.getOperationAndRightTerm(expression, expression.length - 1))
     }
 
     @Test
