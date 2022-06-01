@@ -17,7 +17,7 @@ class DiagramTransformer {
     fun transformDiagram(diagram: Diagram) {
         val edge = diagram.edges.getFirstEdgeWithNonAtomicTerm()
         diagram.edges.remove(edge)
-        val nonAtomicTerm = edge.term as NonAtomicTerm
+        val nonAtomicTerm = edge.label as NonAtomicTerm
 
         when (nonAtomicTerm.operation) {
             OperationEnum.COMPOSITION -> transformComposition(diagram = diagram, edge = edge)

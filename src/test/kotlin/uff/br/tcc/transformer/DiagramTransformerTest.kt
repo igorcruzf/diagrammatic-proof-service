@@ -122,11 +122,11 @@ class DiagramTransformerTest {
         assertEquals(StepDescriptionEnum.REMOVE_INTERSECTION.name, diagram.stepDescription)
         assertEquals(2, diagram.nodes.count())
 
-        assertEquals(AtomicTerm("A"), firstDiagramEdge.term)
+        assertEquals(AtomicTerm("A"), firstDiagramEdge.label)
         assertEquals(inputNode, firstDiagramEdge.leftNode)
         assertEquals(outputNode, firstDiagramEdge.rightNode)
 
-        assertEquals(AtomicTerm("B"), secondDiagramEdge.term)
+        assertEquals(AtomicTerm("B"), secondDiagramEdge.label)
         assertEquals(inputNode, secondDiagramEdge.leftNode)
         assertEquals(outputNode, secondDiagramEdge.rightNode)
     }
@@ -136,18 +136,18 @@ class DiagramTransformerTest {
         assertEquals(firstDiagramEdge.rightNode, secondDiagramEdge.leftNode)
         assertEquals(3, diagram.nodes.count())
 
-        assertEquals(AtomicTerm("A"), firstDiagramEdge.term)
+        assertEquals(AtomicTerm("A"), firstDiagramEdge.label)
         assertEquals(inputNode, firstDiagramEdge.leftNode)
         assertEquals(NodeTypeEnum.INTERMEDIATE, firstDiagramEdge.rightNode.type)
 
-        assertEquals(AtomicTerm("B"), secondDiagramEdge.term)
+        assertEquals(AtomicTerm("B"), secondDiagramEdge.label)
         assertEquals(outputNode, secondDiagramEdge.rightNode)
         assertEquals(NodeTypeEnum.INTERMEDIATE, secondDiagramEdge.leftNode.type)
     }
 
     private fun assertInverse(diagram: Diagram, diagramEdge: Edge) {
         assertEquals(StepDescriptionEnum.REMOVE_INVERSE.name, diagram.stepDescription)
-        assertEquals(AtomicTerm("A"), diagramEdge.term)
+        assertEquals(AtomicTerm("A"), diagramEdge.label)
         assertEquals(outputNode, diagramEdge.leftNode)
         assertEquals(inputNode, diagramEdge.rightNode)
     }
@@ -172,7 +172,7 @@ class DiagramTransformerTest {
     private fun buildEdge(term: ITerm) = Edge(
         leftNode = inputNode,
         rightNode = outputNode,
-        term = term
+        label = term
     )
 
     private fun buildDiagramWithoutEdge(inputNode: Node, outputNode: Node) =

@@ -3,13 +3,13 @@ package uff.br.tcc.enum
 enum class OperationEnum {
 
     INTERSECTION {
-        override fun symbol() = "\\cap"
+        override fun symbol() = "int"
     },
     COMPOSITION {
-        override fun symbol() = "\\circ"
+        override fun symbol() = "comp"
     },
     INVERSE {
-        override fun symbol() = "\\inv"
+        override fun symbol() = "inv"
     };
 
     abstract fun symbol(): String

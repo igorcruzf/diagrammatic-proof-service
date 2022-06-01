@@ -12,7 +12,7 @@ data class Edge(
     @JsonProperty("right_node")
     val rightNode: Node,
 
-    val term: ITerm,
+    val label: ITerm,
 
     @get:JsonIgnore
     var isMappedInLeftDiagram: Boolean = false

@@ -5,12 +5,12 @@ import uff.br.tcc.model.term.NonAtomicTerm
 
 fun MutableList<Edge>.hasAnyNonAtomicTerm(): Boolean {
     return this.any {
-        it.term is NonAtomicTerm
+        it.label is NonAtomicTerm
     }
 }
 
 fun MutableList<Edge>.getFirstEdgeWithNonAtomicTerm(): Edge {
     return this.first {
-        it.term is NonAtomicTerm
+        it.label is NonAtomicTerm
     }
 }

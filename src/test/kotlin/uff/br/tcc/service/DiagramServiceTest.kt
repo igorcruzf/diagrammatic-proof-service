@@ -38,13 +38,13 @@ class DiagramServiceTest {
         diagramService.addDiagramsUntilNormalForm(diagrammaticProof)
         val lastStepDiagram = diagrammaticProof.diagrams.last()
 
-        assertEquals(normalCompositionDiagram.edges.first().term, lastStepDiagram.edges.first().term)
+        assertEquals(normalCompositionDiagram.edges.first().label, lastStepDiagram.edges.first().label)
         assertEquals(normalCompositionDiagram.edges.first().leftNode, lastStepDiagram.edges.first().leftNode)
         assertEquals(
             normalCompositionDiagram.edges.first().rightNode.type,
             lastStepDiagram.edges.first().rightNode.type
         )
-        assertEquals(normalCompositionDiagram.edges.last().term, lastStepDiagram.edges.last().term)
+        assertEquals(normalCompositionDiagram.edges.last().label, lastStepDiagram.edges.last().label)
         assertEquals(normalCompositionDiagram.edges.last().leftNode.type, lastStepDiagram.edges.last().leftNode.type)
         assertEquals(normalCompositionDiagram.edges.last().rightNode, lastStepDiagram.edges.last().rightNode)
     }
@@ -61,11 +61,11 @@ class DiagramServiceTest {
 
     @Test
     fun `should transform expression in two diagrammatic proofs with normaldiagrams and should be homomorphic in both directions`() {
-        val expression = "(R \\circ S)\\cap T \\subseteq ((R \\cap(T \\circ (S\\inv))) \\circ (((R\\inv) \\circ T) \\cap S)) \\cap T"
+        val expression = "(R comp S)int T inc ((R int(T comp (Sinv))) comp (((Rinv) comp T) int S)) int T"
         val diagrammaticProofResponse = diagramService.transformDiagramsAndValidateHomomorphism(expression)
         assertTrue(diagrammaticProofResponse.isHomomorphic)
 
-        val expression2 = "((R \\cap(T \\circ (S\\inv))) \\circ (((R\\inv) \\circ T) \\cap S)) \\cap T \\subseteq (R \\circ S)\\cap T"
+        val expression2 = "((R int(T comp (Sinv))) comp (((Rinv) comp T) int S)) int T inc (R comp S)int T"
         val diagrammaticProofResponse2 = diagramService.transformDiagramsAndValidateHomomorphism(expression2)
         assertTrue(diagrammaticProofResponse2.isHomomorphic)
     }

@@ -16,7 +16,7 @@ import uff.br.tcc.model.term.NonAtomicTerm
 class RequestTransformer {
 
     companion object {
-        const val SUB_SET_EQUALS = "\\subseteq"
+        const val SUB_SET_EQUALS = "inc"
     }
 
     fun splitToDiagrams(expression: String): List<String> {
@@ -37,7 +37,7 @@ class RequestTransformer {
                     edges = mutableListOf(
                         Edge(
                             leftNode = inputNode,
-                            term = transformToTerms(diagramStringRequest.filter { !it.isWhitespace() }),
+                            label = transformToTerms(diagramStringRequest.filter { !it.isWhitespace() }),
                             rightNode = outputNode
                         )
                     ),

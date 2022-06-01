@@ -19,7 +19,7 @@ fun atomicDiagram(name: String): Diagram {
         edges = mutableListOf(
             Edge(
                 leftNode = inputNode,
-                term = AtomicTerm(name),
+                label = AtomicTerm(name),
                 rightNode = outputNode
             )
         ),
@@ -36,7 +36,7 @@ fun normalInverseDiagram(name: String): Diagram {
         edges = mutableListOf(
             Edge(
                 leftNode = outputNode,
-                term = AtomicTerm(name),
+                label = AtomicTerm(name),
                 rightNode = inputNode
             )
         ),
@@ -53,12 +53,12 @@ fun normalIntersectionDiagram(leftName: String, rightName: String): Diagram {
         edges = mutableListOf(
             Edge(
                 leftNode = inputNode,
-                term = AtomicTerm(leftName),
+                label = AtomicTerm(leftName),
                 rightNode = outputNode
             ),
             Edge(
                 leftNode = inputNode,
-                term = AtomicTerm(rightName),
+                label = AtomicTerm(rightName),
                 rightNode = outputNode
             )
         ),
@@ -76,12 +76,12 @@ fun normalCompositionDiagram(leftName: String, rightName: String): Diagram {
         edges = mutableListOf(
             Edge(
                 leftNode = inputNode,
-                term = AtomicTerm(leftName),
+                label = AtomicTerm(leftName),
                 rightNode = intermediateNode
             ),
             Edge(
                 leftNode = intermediateNode,
-                term = AtomicTerm(rightName),
+                label = AtomicTerm(rightName),
                 rightNode = outputNode
             )
         ),
@@ -143,13 +143,13 @@ fun buildDiagrammaticProofWithIntersection(leftName: String, rightName: String):
 fun buildEdgeWithInverse(inputNode: Node, outputNode: Node, name: String) = Edge(
     leftNode = inputNode,
     rightNode = outputNode,
-    term = NonAtomicTerm(leftTerm = AtomicTerm(name), operation = OperationEnum.INVERSE)
+    label = NonAtomicTerm(leftTerm = AtomicTerm(name), operation = OperationEnum.INVERSE)
 )
 
 fun buildEdgeWithComposition(inputNode: Node, outputNode: Node, leftName: String, rightName: String) = Edge(
     leftNode = inputNode,
     rightNode = outputNode,
-    term = NonAtomicTerm(
+    label = NonAtomicTerm(
         leftTerm = AtomicTerm(leftName), operation = OperationEnum.COMPOSITION,
         rightTerm = AtomicTerm(rightName)
     )
@@ -158,7 +158,7 @@ fun buildEdgeWithComposition(inputNode: Node, outputNode: Node, leftName: String
 fun buildEdgeWithIntersection(inputNode: Node, outputNode: Node, leftName: String, rightName: String) = Edge(
     leftNode = inputNode,
     rightNode = outputNode,
-    term = NonAtomicTerm(
+    label = NonAtomicTerm(
         leftTerm = AtomicTerm(leftName), operation = OperationEnum.INTERSECTION,
         rightTerm = AtomicTerm(rightName)
     )

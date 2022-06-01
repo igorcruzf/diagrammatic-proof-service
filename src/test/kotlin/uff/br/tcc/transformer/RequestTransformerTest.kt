@@ -86,18 +86,18 @@ class RequestTransformerTest {
         assertEquals(
             "A",
             requestTransformer.getRightTerm(
-                "\\capA", OperationEnum.INTERSECTION
+                "intA", OperationEnum.INTERSECTION
             )
         )
         assertEquals(
-            "(A\\capB)",
+            "(AintB)",
             requestTransformer.getRightTerm(
-                "\\cap(A\\capB)", OperationEnum.INTERSECTION
+                "int(AintB)", OperationEnum.INTERSECTION
             )
         )
         assertNull(
             requestTransformer.getRightTerm(
-                "\\cap", OperationEnum.INTERSECTION
+                "int", OperationEnum.INTERSECTION
             )
         )
     }
@@ -107,18 +107,18 @@ class RequestTransformerTest {
         assertEquals(
             "A",
             requestTransformer.getRightTerm(
-                "\\invA", OperationEnum.INVERSE
+                "invA", OperationEnum.INVERSE
             )
         )
         assertEquals(
-            "(A\\invB)",
+            "(AinvB)",
             requestTransformer.getRightTerm(
-                "\\inv(A\\invB)", OperationEnum.INVERSE
+                "inv(AinvB)", OperationEnum.INVERSE
             )
         )
         assertNull(
             requestTransformer.getRightTerm(
-                "\\inv", OperationEnum.INVERSE
+                "inv", OperationEnum.INVERSE
             )
         )
     }
@@ -128,49 +128,49 @@ class RequestTransformerTest {
         assertEquals(
             "A",
             requestTransformer.getRightTerm(
-                "\\circA", OperationEnum.COMPOSITION
+                "compA", OperationEnum.COMPOSITION
             )
         )
         assertEquals(
-            "(A\\circB)",
+            "(AcompB)",
             requestTransformer.getRightTerm(
-                "\\circ(A\\circB)", OperationEnum.COMPOSITION
+                "comp(AcompB)", OperationEnum.COMPOSITION
             )
         )
         assertNull(
             requestTransformer.getRightTerm(
-                "\\circ", OperationEnum.COMPOSITION
+                "comp", OperationEnum.COMPOSITION
             )
         )
     }
 
     @Test
     fun `should get operation and term in expression after left parenthesis`() {
-        val expression = "(A\\capB)\\circC"
+        val expression = "(AintB)compC"
         assertEquals(
-            "\\circC",
-            requestTransformer.getOperationAndRightTerm(expression, 7)
+            "compC",
+            requestTransformer.getOperationAndRightTerm(expression, expression.length-6)
         )
     }
 
     @Test
     fun `should get operation in expression after left parenthesis`() {
-        val expression = "(A\\capB)\\inv"
+        val expression = "(AintB)inv"
         assertEquals(
-            "\\inv",
-            requestTransformer.getOperationAndRightTerm(expression, 7)
+            "inv",
+            requestTransformer.getOperationAndRightTerm(expression, expression.length-4)
         )
     }
 
     @Test
     fun `should return null in get operation and right term with nothing after left parenthesis`() {
-        val expression = "(A\\capB)"
-        assertNull(requestTransformer.getOperationAndRightTerm(expression, 7))
+        val expression = "(AintB)"
+        assertNull(requestTransformer.getOperationAndRightTerm(expression, expression.length-1))
     }
 
     @Test
     fun `should transform to term with intersection inside parenthesis`() {
-        val expression = "(A\\capB)"
+        val expression = "(AintB)"
         val term = NonAtomicTerm(
             leftTerm = AtomicTerm("A"),
             operation = OperationEnum.INTERSECTION,
@@ -181,7 +181,7 @@ class RequestTransformerTest {
 
     @Test
     fun `should transform to term with inverse inside parenthesis`() {
-        val expression = "(A\\inv)"
+        val expression = "(Ainv)"
         val term = NonAtomicTerm(
             leftTerm = AtomicTerm("A"),
             operation = OperationEnum.INVERSE,
@@ -192,7 +192,7 @@ class RequestTransformerTest {
 
     @Test
     fun `should transform to term with composition inside parenthesis`() {
-        val expression = "(A\\circB)"
+        val expression = "(AcompB)"
         val term = NonAtomicTerm(
             leftTerm = AtomicTerm("A"),
             operation = OperationEnum.COMPOSITION,
@@ -203,7 +203,7 @@ class RequestTransformerTest {
 
     @Test
     fun `should transform to term with non atomics terms inside parenthesis`() {
-        val expression = "((A\\circB)\\capC)\\inv"
+        val expression = "((AcompB)intC)inv"
         val term = NonAtomicTerm(
             leftTerm = NonAtomicTerm(
                 leftTerm = NonAtomicTerm(
@@ -221,7 +221,7 @@ class RequestTransformerTest {
 
     @Test
     fun `should transform to term with non atomics terms with parenthesis`() {
-        val expression = "A\\cap(((A\\circB)\\capC)\\inv)"
+        val expression = "Aint(((AcompB)intC)inv)"
         val term = NonAtomicTerm(
             leftTerm = AtomicTerm("A"),
             operation = OperationEnum.INTERSECTION,
@@ -243,7 +243,7 @@ class RequestTransformerTest {
 
     @Test
     fun `should transform to term with non atomics terms without parenthesis`() {
-        val expression = "A\\circB\\capC\\inv"
+        val expression = "AcompBintCinv"
         val term = NonAtomicTerm(
             leftTerm = AtomicTerm("A"),
             operation = OperationEnum.COMPOSITION,
@@ -261,7 +261,7 @@ class RequestTransformerTest {
 
     @Test
     fun `should transform to diagrammatic proof`() {
-        val expression = "A\\cap(((A\\circB)\\capC)\\inv)"
+        val expression = "Aint(((AcompB)intC)inv)"
         val term = NonAtomicTerm(
             leftTerm = AtomicTerm("A"),
             operation = OperationEnum.INTERSECTION,
@@ -280,7 +280,7 @@ class RequestTransformerTest {
         )
         val diagrammaticProof = requestTransformer.transformToDiagrammaticProof(expression)
 
-        assertEquals(term, diagrammaticProof.diagrams.first().edges.first().term)
+        assertEquals(term, diagrammaticProof.diagrams.first().edges.first().label)
         assertEquals(NodeTypeEnum.INPUT, diagrammaticProof.diagrams.first().edges.first().leftNode.type)
         assertEquals(NodeTypeEnum.OUTPUT, diagrammaticProof.diagrams.first().edges.first().rightNode.type)
         assertEquals(StepDescriptionEnum.BEGIN.name, diagrammaticProof.diagrams.first().stepDescription)
@@ -290,8 +290,8 @@ class RequestTransformerTest {
 
     @Test
     fun `should split into two expressions`() {
-        val oneExpression = "A\\cap(((A\\circB)\\capC)\\inv)"
-        val expression = "A\\cap(((A\\circB)\\capC)\\inv)\\subseteqA\\cap(((A\\circB)\\capC)\\inv)"
+        val oneExpression = "Aint(((AcompB)intC)inv)"
+        val expression = "Aint(((AcompB)intC)inv)incAint(((AcompB)intC)inv)"
         val splattedExpressions = requestTransformer.splitToDiagrams(expression)
         assertEquals(oneExpression, splattedExpressions.first())
         assertEquals(oneExpression, splattedExpressions.last())
@@ -299,7 +299,7 @@ class RequestTransformerTest {
 
     @Test
     fun `should throw IllegalArgumentException for having one expression`() {
-        val oneExpression = "A\\cap(((A\\circB)\\capC)\\inv)"
+        val oneExpression = "Aint(((AcompB)intC)inv)"
 
         assertThrows<IllegalArgumentException> {
             requestTransformer.splitToDiagrams(oneExpression)
@@ -308,37 +308,37 @@ class RequestTransformerTest {
 
     @Test
     fun `should throw IllegalArgumentException for having more than two expressions`() {
-        val expression = "A\\cap(((A\\circB)\\capC)\\inv)\\subseteqA\\cap(((A\\circB)\\capC)\\inv)\\subseteqA\\cap(((A\\circB)\\capC)\\inv)"
+        val expression = "Aint(((AcompB)intC)inv)incAint(((AcompB)intC)inv)incAint(((AcompB)intC)inv)"
         assertThrows<IllegalArgumentException> {
             requestTransformer.splitToDiagrams(expression)
         }
     }
 
     private fun buildIntersectionExpressions(): List<String> {
-        val expression = "A\\capB\\invC\\circc"
-        val anotherExpression = "cap\\capcap"
-        val anotherExpression2 = "inv\\capcirc"
+        val expression = "AintBinvCcompc"
+        val anotherExpression = "inintin"
+        val anotherExpression2 = "inaint"
         return listOf(expression, anotherExpression, anotherExpression2)
     }
 
     private fun buildInverseExpressions(): List<String> {
-        val expression = "A\\inv\\capc\\circc"
-        val anotherExpression = "inv\\invinv"
-        val anotherExpression2 = "cap\\invcirc"
+        val expression = "Ainvintccompc"
+        val anotherExpression = "invinvinv"
+        val anotherExpression2 = "capinvcirc"
         return listOf(expression, anotherExpression, anotherExpression2)
     }
 
     private fun buildCompositionExpressions(): List<String> {
-        val expression = "A\\circ\\inv\\capc"
-        val anotherExpression = "circ\\circcirc"
-        val anotherExpression2 = "cap\\circinv"
+        val expression = "Acompinvintc"
+        val anotherExpression = "circcompcirc"
+        val anotherExpression2 = "capcompinv"
         return listOf(expression, anotherExpression, anotherExpression2)
     }
 
     private fun buildEmptyExpressions(): List<String> {
         return listOf(
-            "A\\cir\\iv\\cac",
-            "capinvcirc",
+            "Ainavinatac",
+            "capinsvcirc",
             "",
             "A",
             "banana"
@@ -347,8 +347,8 @@ class RequestTransformerTest {
 
     private fun buildEmptyExpressionsWithParenthesis(): List<String> {
         return listOf(
-            "(A\\cir\\iv\\cac)",
-            "(capinvcirc)",
+            "(Ainavinatac)",
+            "(capinsvcirc)",
             "()",
             "A()",
             "(A)",

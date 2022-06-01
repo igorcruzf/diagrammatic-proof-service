@@ -1,7 +1,7 @@
 ## Objetivo
-Essa API tem como objetivo transformar diagramas para cálculo por grafo e
-verificar se há homomorfismo entre os diagramas, com objetivo de verificar
-se a inclusão é verdadeira ou não.
+Essa API implementa um procedimento de decisão para validade de inclusões no fragmento geométrico de BGL (Basic Graph Logic).
+
+Dado uma inclusão entre grafos de GeoBGL, o procedimento coloca os grafos em forma normal e verifica se há homomorfismo entre eles.
 
 
 ## Como executar
@@ -14,26 +14,25 @@ Para executar a aplicação é necessário ter java 17 configurado na máquina e
 ### /diagrams/validate-homomorphism?expression={{expression}}
 
 ### Exemplo:
-    curl --location --request GET 'localhost:8080/diagrams/validate-homomorphism?expression=(A%5CcapB)%5Cinv%5Csubseteq(A%5CcapB)%5Cinv'
+    curl --location --request GET 'localhost:8080/diagrams/validate-homomorphism?expression=(AintB)invinc(AintB)inv'
 #### Entrada:
     
 Uma expressão de subconjunto por exemplo:
   
-    (A %5Ccap B)%5Cinv %5Csubseteq A
+    (A int B)inv inc A
 
-- O comando \ é codificado para passar no parâmetro como %5C
-- É necessário passar o comando %5Csubseteq no meio da expressão
-- Qualquer termo pode ser uma letra ou nome qualquer, ex: A, banana, b
+- É necessário passar o comando inc no meio da expressão
+- Qualquer termo pode ser uma letra ou nome qualquer desde que não seja uma operação ou o símbolo da inclusão, ex: A, banana, b
 - Operações disponíveis:
-  - %5Ccap (\cap) = interseção
-  - %5Cinv (\inv) = inversa
-  - %5Ccirc (\circ) = composição
-  - %5Csubseteq (\subseteq) = inclusão
+  - int = interseção
+  - inv = inversa
+  - comp = composição
+- Símbolo da inclusão = inc
 - Pode ser utilizado espaços e parentêses para organização
 - Recomendado usar o parênteses na inversão, exemplo:
-  - (A%5Cinv) 
-  - A%5Ccap(B%5Cinv)
-  - ((A%5CcapB)%5Cinv)
+  - (Ainv) 
+  - A int (Binv)
+  - ((A int B)inv)
 
 #### Saída:
 
@@ -46,9 +45,9 @@ Cada objeto tem uma lista de diagramas e cada diagrama possui:
   - lista de arestas (edges):
     - todas as arestas nesse diagrama
     - cada aresta possui um nó da esquerda dessa aresta, um termo e um nó da direita
-    - cada termo possui:
-      - um nome se for atômico (sem operação)
-      - ou um termo, uma operação e outro termo (caso a operação não seja a inversa)
+    - cada rótulo possui:
+      - um nome se for um termo atômico (sem operação)
+      - ou um termo, uma operação e, caso a operação não seja a inversa, outro termo 
   - lista de nós (nodes):
     - todos os nós existentes nesse diagrama
     - cada nó possui um nome e um tipo

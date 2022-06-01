@@ -84,7 +84,7 @@ class HomomorphismValidator {
     ): List<Edge> {
         val newEdgesPath = edgesPath.plus(rightDiagramEdge)
         return leftDiagramEdges.filter { edge ->
-            edge.term.name() == rightDiagramEdge.term.name() &&
+            edge.label.name() == rightDiagramEdge.label.name() &&
                 isNodesTypeValid(rightDiagramEdge, edge) &&
                 isNodeImageToRightDiagramNode(edge.rightNode.name, rightDiagramEdge.rightNode.name, newEdgesPath) &&
                 isNodeImageToRightDiagramNode(edge.leftNode.name, rightDiagramEdge.leftNode.name, newEdgesPath)
