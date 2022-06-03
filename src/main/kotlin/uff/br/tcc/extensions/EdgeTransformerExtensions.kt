@@ -9,22 +9,20 @@ import java.util.UUID
 
 fun Edge.validateUnaryOperation() {
     label as NonAtomicTerm
-    if (label.rightTerm != null) {
+    label.rightTerm?.let {
         throw InvalidParameterException(
-            "Error transforming label ${label.leftTerm.name()} with operation ${label.operation.symbol()} because " +
-                "right term is ${label.rightTerm.name()} instead of null."
+            "Error transforming label ${label.leftTerm.name()} with operation " +
+                "${label.operation.symbol()} because right term is ${label.rightTerm.name()} instead of null."
         )
     }
 }
 
 fun Edge.validateBinaryOperation() {
     label as NonAtomicTerm
-    if (label.rightTerm == null) {
-        throw InvalidParameterException(
-            "Error transforming label ${label.leftTerm.name()} with operation ${label.operation.symbol()} because " +
-                "right term is null"
-        )
-    }
+    label.rightTerm ?: throw InvalidParameterException(
+        "Error transforming label ${label.leftTerm.name()} " +
+            "with operation ${label.operation.symbol()} because right term is null."
+    )
 }
 
 fun Edge.transformInverse(): Edge {
