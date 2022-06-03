@@ -129,7 +129,8 @@ class RequestTransformer {
         val operation = operationAndRightTerm?.let {
             getFirstOperation(operationAndRightTerm)?.also {
                 logger.info("Operation ${it.name} is the first operation in $operationAndRightTerm.")
-            }
+            } ?: throw InvalidParameterException("There is a term $operationAndRightTerm but was expected to be" +
+                    "an operation first.")
         }
         return operation?.let {
             val rightTerm = getRightTerm(operationAndRightTerm, operation)
