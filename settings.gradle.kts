@@ -1,1 +1,1 @@
-rootProject.name = "tcc"
+rootProject.name = "diagrammatic-proof-service"
