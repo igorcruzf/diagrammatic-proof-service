@@ -13,7 +13,7 @@ class ExceptionHandler {
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
     @ExceptionHandler(InvalidParameterException::class)
-    fun handleGameNotFoundException(
+    fun handleInvalidParameterException(
         exception: InvalidParameterException
     ): ResponseEntity<ErrorResponse> {
         return buildResponse(
