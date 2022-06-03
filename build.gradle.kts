@@ -32,6 +32,7 @@ detekt {
 
 dependencies {
 //    detekt("org.jetbrains.kotlin:kotlin-compiler-embeddable:1.6.0-RC")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter:2.6.7")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")

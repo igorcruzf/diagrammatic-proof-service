@@ -8,10 +8,7 @@ Dado uma inclusão entre grafos de GeoBGL, o procedimento coloca os grafos em fo
 Para executar a aplicação é necessário ter java 17 configurado na máquina e rodar o comando
 ``.\gradlew bootRun`` na raiz do projeto.
 
-### A aplicação está disponível remotamente via plataforma do Heroku, pela url:
-
-https://diagrammatic-proof-service.herokuapp.com
-
+### A aplicação está disponível remotamente via plataforma do Heroku.
 ## Endpoint
 
 ### /diagrams/validate-homomorphism?expression={{expression}}

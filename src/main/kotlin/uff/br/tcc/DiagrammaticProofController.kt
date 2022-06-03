@@ -14,6 +14,8 @@ class DiagrammaticProofController(
 ) {
 
     @GetMapping("/validate-homomorphism")
-    fun validateHomomorphism(@RequestParam expression: String) =
-        diagramService.transformDiagramsAndValidateHomomorphism(expression)
+    fun validateHomomorphism(
+        @RequestParam
+        expression: String
+    ) = diagramService.transformDiagramsAndValidateHomomorphism(expression)
 }

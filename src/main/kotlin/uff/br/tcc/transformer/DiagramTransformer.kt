@@ -1,5 +1,6 @@
 package uff.br.tcc.transformer
 
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uff.br.tcc.enum.OperationEnum
 import uff.br.tcc.enum.StepDescriptionEnum
@@ -14,8 +15,12 @@ import uff.br.tcc.model.term.NonAtomicTerm
 @Component
 class DiagramTransformer {
 
+    private val logger = LoggerFactory.getLogger(this.javaClass)
+
     fun transformDiagram(diagram: Diagram) {
+        logger.info("Transforming diagram $diagram.")
         val edge = diagram.edges.getFirstEdgeWithNonAtomicTerm()
+        logger.info("First non atomic edge is $edge.")
         diagram.edges.remove(edge)
         val nonAtomicTerm = edge.label as NonAtomicTerm
 
@@ -24,9 +29,11 @@ class DiagramTransformer {
             OperationEnum.INTERSECTION -> transformIntersection(diagram = diagram, edge = edge)
             OperationEnum.INVERSE -> transformInverse(diagram = diagram, edge = edge)
         }
+        logger.info("Diagram transformed to $diagram.")
     }
 
     fun transformComposition(diagram: Diagram, edge: Edge) {
+        logger.info("Transforming composition in edge $edge.")
         val (firstEdge, secondEdge, node) = edge.transformComposition()
         diagram.nodes.add(node)
         diagram.edges.add(firstEdge)
@@ -35,6 +42,7 @@ class DiagramTransformer {
     }
 
     fun transformIntersection(diagram: Diagram, edge: Edge) {
+        logger.info("Transforming intersection in edge $edge.")
         val (firstEdge, secondEdge) = edge.transformIntersection()
         diagram.edges.add(firstEdge)
         diagram.edges.add(secondEdge)
@@ -42,6 +50,7 @@ class DiagramTransformer {
     }
 
     fun transformInverse(diagram: Diagram, edge: Edge) {
+        logger.info("Transforming inverse in edge $edge.")
         val newEdge = edge.transformInverse()
         diagram.edges.add(newEdge)
         diagram.stepDescription = StepDescriptionEnum.REMOVE_INVERSE.name

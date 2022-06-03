@@ -4,10 +4,19 @@ import uff.br.tcc.enum.NodeTypeEnum
 import uff.br.tcc.model.Edge
 import uff.br.tcc.model.Node
 import uff.br.tcc.model.term.NonAtomicTerm
+import java.security.InvalidParameterException
 import java.util.UUID
 
 fun Edge.transformInverse(): Edge {
     label as NonAtomicTerm
+
+    if (label.rightTerm != null) {
+        throw InvalidParameterException(
+            "Error transforming label ${label.leftTerm} with inverse operation because " +
+                "right term is ${label.rightTerm} instead of null."
+        )
+    }
+
     return Edge(leftNode = rightNode, rightNode = leftNode, label = label.leftTerm)
 }
 

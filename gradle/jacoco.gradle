@@ -26,6 +26,7 @@ jacocoTestReport {
             'src/main/kotlin/uff/br/tcc/helper/**',
             'src/main/kotlin/uff/br/tcc/enum/**',
             'src/main/kotlin/uff/br/tcc/model/**',
+            'src/main/kotlin/uff/br/tcc/exception/**',
             'src/main/kotlin/uff/br/tcc/DiagrammaticProofController*'
     ]
 
