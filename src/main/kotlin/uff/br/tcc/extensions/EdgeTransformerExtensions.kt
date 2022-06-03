@@ -12,8 +12,8 @@ fun Edge.transformInverse(): Edge {
 
     if (label.rightTerm != null) {
         throw InvalidParameterException(
-            "Error transforming label ${label.leftTerm} with inverse operation because " +
-                "right term is ${label.rightTerm} instead of null."
+            "Error transforming label ${label.leftTerm.name()} with inverse operation because " +
+                "right term is ${label.rightTerm.name()} instead of null."
         )
     }
 
