@@ -21,7 +21,7 @@ fun Edge.validateBinaryOperation() {
     label as NonAtomicTerm
     if (label.rightTerm == null) {
         throw InvalidParameterException(
-            "Error transforming label ${label.leftTerm.name()} with inverse operation because " +
+            "Error transforming label ${label.leftTerm.name()} with operation ${label.operation.symbol()} because " +
                 "right term is null"
         )
     }
