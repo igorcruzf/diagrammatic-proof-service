@@ -9,5 +9,11 @@ data class Diagram(
     val edges: MutableList<Edge>,
 
     @JsonProperty("step_description")
-    var stepDescription: String
+    var stepDescription: String,
+
+    @JsonProperty("removed_edge")
+    var removedEdge: Edge? = null,
+
+    @JsonProperty("created_edges")
+    var createdEdges: List<Edge>? = null
 )

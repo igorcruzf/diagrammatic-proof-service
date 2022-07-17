@@ -34,7 +34,9 @@ class DiagramTransformer {
 
     fun transformComposition(diagram: Diagram, edge: Edge) {
         logger.info("Transforming composition in edge $edge.")
+        diagram.removedEdge = edge
         val (firstEdge, secondEdge, node) = edge.transformComposition()
+        diagram.createdEdges = listOf(firstEdge, secondEdge)
         diagram.nodes.add(node)
         diagram.edges.add(firstEdge)
         diagram.edges.add(secondEdge)
@@ -43,7 +45,9 @@ class DiagramTransformer {
 
     fun transformIntersection(diagram: Diagram, edge: Edge) {
         logger.info("Transforming intersection in edge $edge.")
+        diagram.removedEdge = edge
         val (firstEdge, secondEdge) = edge.transformIntersection()
+        diagram.createdEdges = listOf(firstEdge, secondEdge)
         diagram.edges.add(firstEdge)
         diagram.edges.add(secondEdge)
         diagram.stepDescription = StepDescriptionEnum.REMOVE_INTERSECTION.name
@@ -51,7 +55,9 @@ class DiagramTransformer {
 
     fun transformInverse(diagram: Diagram, edge: Edge) {
         logger.info("Transforming inverse in edge $edge.")
+        diagram.removedEdge = edge
         val newEdge = edge.transformInverse()
+        diagram.createdEdges = listOf(newEdge)
         diagram.edges.add(newEdge)
         diagram.stepDescription = StepDescriptionEnum.REMOVE_INVERSE.name
     }
