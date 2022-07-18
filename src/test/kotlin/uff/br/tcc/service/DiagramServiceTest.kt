@@ -1,8 +1,10 @@
 package uff.br.tcc.service
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import uff.br.tcc.model.Edge
 import uff.br.tcc.transformer.DiagramTransformer
 import uff.br.tcc.transformer.RequestTransformer
 import uff.br.tcc.utils.buildDiagrammaticProofWithComposition
@@ -27,7 +29,7 @@ class DiagramServiceTest {
         diagramService.addDiagramsUntilNormalForm(diagrammaticProof)
         val lastStepDiagram = diagrammaticProof.diagrams.last()
 
-        assertEquals(normalIntersectionDiagram.edges, lastStepDiagram.edges)
+        assertEdges(normalIntersectionDiagram.edges, lastStepDiagram.edges)
         assertEquals(normalIntersectionDiagram.nodes, lastStepDiagram.nodes)
     }
 
@@ -56,7 +58,7 @@ class DiagramServiceTest {
         diagramService.addDiagramsUntilNormalForm(diagrammaticProof)
         val lastStepDiagram = diagrammaticProof.diagrams.last()
 
-        assertEquals(normalInverseDiagram.edges, lastStepDiagram.edges)
+        assertEdges(normalInverseDiagram.edges, lastStepDiagram.edges)
     }
 
     @Test
@@ -68,5 +70,19 @@ class DiagramServiceTest {
         val expression2 = "((R int(T comp (Sinv))) comp (((Rinv) comp T) int S)) int T inc (R comp S)int T"
         val diagrammaticProofResponse2 = diagramService.transformDiagramsAndValidateHomomorphism(expression2)
         assertTrue(diagrammaticProofResponse2.isHomomorphic)
+    }
+
+    fun assertEdges(firstEdges: List<Edge>, secondEdges: List<Edge>) {
+        assertEquals(firstEdges.size, secondEdges.size)
+        firstEdges.forEach { firstEdge ->
+            assertNotNull(
+                secondEdges.find {
+                    it.label == firstEdge.label &&
+                        it.leftNode == firstEdge.leftNode &&
+                        it.rightNode == firstEdge.rightNode &&
+                        it.isMappedInLeftDiagram == firstEdge.isMappedInLeftDiagram
+                }
+            )
+        }
     }
 }

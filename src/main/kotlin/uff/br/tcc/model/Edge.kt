@@ -3,6 +3,7 @@ package uff.br.tcc.model
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import uff.br.tcc.model.term.ITerm
+import java.util.UUID
 
 data class Edge(
 
@@ -15,5 +16,7 @@ data class Edge(
     val label: ITerm,
 
     @get:JsonIgnore
-    var isMappedInLeftDiagram: Boolean = false
+    var isMappedInLeftDiagram: Boolean = false,
+
+    val id: String = UUID.randomUUID().toString(),
 )
