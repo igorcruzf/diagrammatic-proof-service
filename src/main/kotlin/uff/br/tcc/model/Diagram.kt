@@ -15,5 +15,8 @@ data class Diagram(
     var removedEdge: Edge? = null,
 
     @JsonProperty("created_edges")
-    var createdEdges: List<Edge>? = null
+    var createdEdges: List<Edge>? = null,
+
+    @JsonProperty("created_node")
+    var createdNode: Node? = null
 )

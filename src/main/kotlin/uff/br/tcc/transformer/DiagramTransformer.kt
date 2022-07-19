@@ -37,6 +37,7 @@ class DiagramTransformer {
         diagram.removedEdge = edge
         val (firstEdge, secondEdge, node) = edge.transformComposition()
         diagram.createdEdges = listOf(firstEdge, secondEdge)
+        diagram.createdNode = node
         diagram.nodes.add(node)
         diagram.edges.add(firstEdge)
         diagram.edges.add(secondEdge)

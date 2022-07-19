@@ -46,8 +46,7 @@ class HomomorphismValidator {
         logger.info("Left diagram edges in position $position with node $leftDiagramNodeName = $leftDiagramEdges.")
 
         val validEdges = rightDiagramEdges.filter { edge ->
-            edge.isMappedInLeftDiagram ||
-                edgesPath.contains(edge) ||
+            edgesPath.contains(edge) ||
                 canMapEdgeToLeftDiagram(
                     leftDiagramEdges = leftDiagramEdges,
                     rightDiagramEdge = edge,
@@ -84,7 +83,6 @@ class HomomorphismValidator {
 
     private fun addImageInNodes(rightDiagramEdge: Edge, edgeImage: Edge) {
         logger.info("Adding $rightDiagramEdge nodes image to nodes in $edgeImage.")
-        rightDiagramEdge.isMappedInLeftDiagram = true
         rightDiagram.nodes
             .first {
                 it.name == rightDiagramEdge.leftNode.name

@@ -79,8 +79,7 @@ class DiagramServiceTest {
                 secondEdges.find {
                     it.label == firstEdge.label &&
                         it.leftNode == firstEdge.leftNode &&
-                        it.rightNode == firstEdge.rightNode &&
-                        it.isMappedInLeftDiagram == firstEdge.isMappedInLeftDiagram
+                        it.rightNode == firstEdge.rightNode
                 }
             )
         }

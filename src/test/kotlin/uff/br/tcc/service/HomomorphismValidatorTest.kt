@@ -73,6 +73,47 @@ class HomomorphismValidatorTest {
     }
 
     @Test
+    fun `should validate that (A comp B) int (A comp C) is not included in A comp (B int C)`() {
+
+        fun buildLeftDiagram(): Diagram {
+            val nodeA = Node(name = "a", type = NodeTypeEnum.INTERMEDIATE)
+            val nodeB = Node(name = "b", type = NodeTypeEnum.INTERMEDIATE)
+            val inputNode = Node(name = "input", type = NodeTypeEnum.INPUT)
+            val outputNode = Node(name = "output", type = NodeTypeEnum.OUTPUT)
+            return Diagram(
+                nodes = mutableListOf(nodeA, nodeB, inputNode, outputNode),
+                edges = mutableListOf(
+                    Edge(inputNode, nodeA, AtomicTerm("A")),
+                    Edge(nodeA, outputNode, AtomicTerm("B")),
+                    Edge(inputNode, nodeB, AtomicTerm("A")),
+                    Edge(nodeB, outputNode, AtomicTerm("C"))
+                ),
+                stepDescription = ""
+            )
+        }
+
+        fun buildRightDiagram(): Diagram {
+            val nodeA = Node(name = "a", type = NodeTypeEnum.INTERMEDIATE)
+            val inputNode = Node(name = "input", type = NodeTypeEnum.INPUT)
+            val outputNode = Node(name = "output", type = NodeTypeEnum.OUTPUT)
+            return Diagram(
+                nodes = mutableListOf(nodeA, inputNode, outputNode),
+                edges = mutableListOf(
+                    Edge(inputNode, nodeA, AtomicTerm("A")),
+                    Edge(nodeA, outputNode, AtomicTerm("B")),
+                    Edge(nodeA, outputNode, AtomicTerm("C"))
+                ),
+                stepDescription = ""
+            )
+        }
+
+        val leftDiagram = buildLeftDiagram()
+        val rightDiagram = buildRightDiagram()
+
+        assertFalse(homomorphismValidator.validate(leftDiagram, rightDiagram))
+    }
+
+    @Test
     fun `should validate that complex diagram H is included in diagram G but H is not included in G`() {
         val diagramG = buildDiagramG()
         val diagramH = buildDiagramH()
