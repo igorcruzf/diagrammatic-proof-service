@@ -1,4 +1,4 @@
-package uff.br.tcc.model.term
+package uff.br.tcc.dto.term
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonProperty

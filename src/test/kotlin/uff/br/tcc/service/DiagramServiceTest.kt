@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import uff.br.tcc.model.Edge
+import uff.br.tcc.dto.Edge
 import uff.br.tcc.transformer.DiagramTransformer
 import uff.br.tcc.transformer.RequestTransformer
 import uff.br.tcc.utils.buildDiagrammaticProofWithComposition

@@ -3,15 +3,15 @@ package uff.br.tcc.transformer
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import uff.br.tcc.dto.Diagram
+import uff.br.tcc.dto.Edge
+import uff.br.tcc.dto.Node
+import uff.br.tcc.dto.term.AtomicTerm
+import uff.br.tcc.dto.term.ITerm
+import uff.br.tcc.dto.term.NonAtomicTerm
 import uff.br.tcc.enum.NodeTypeEnum
 import uff.br.tcc.enum.OperationEnum
 import uff.br.tcc.enum.StepDescriptionEnum
-import uff.br.tcc.model.Diagram
-import uff.br.tcc.model.Edge
-import uff.br.tcc.model.Node
-import uff.br.tcc.model.term.AtomicTerm
-import uff.br.tcc.model.term.ITerm
-import uff.br.tcc.model.term.NonAtomicTerm
 
 class DiagramTransformerTest {
 

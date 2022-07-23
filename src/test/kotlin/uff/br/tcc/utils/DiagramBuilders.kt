@@ -1,14 +1,14 @@
 package uff.br.tcc.utils
 
+import uff.br.tcc.dto.Diagram
+import uff.br.tcc.dto.DiagrammaticProof
+import uff.br.tcc.dto.Edge
+import uff.br.tcc.dto.Node
+import uff.br.tcc.dto.term.AtomicTerm
+import uff.br.tcc.dto.term.NonAtomicTerm
 import uff.br.tcc.enum.NodeTypeEnum
 import uff.br.tcc.enum.OperationEnum
 import uff.br.tcc.enum.StepDescriptionEnum
-import uff.br.tcc.model.Diagram
-import uff.br.tcc.model.DiagrammaticProof
-import uff.br.tcc.model.Edge
-import uff.br.tcc.model.Node
-import uff.br.tcc.model.term.AtomicTerm
-import uff.br.tcc.model.term.NonAtomicTerm
 
 fun atomicDiagram(name: String): Diagram {
     val inputNode = Node(name = "input", type = NodeTypeEnum.INPUT)

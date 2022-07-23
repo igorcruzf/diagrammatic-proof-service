@@ -3,11 +3,12 @@ package uff.br.tcc.service
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import uff.br.tcc.dto.Diagram
+import uff.br.tcc.dto.Edge
+import uff.br.tcc.dto.HomomorphismValidatorRequest
+import uff.br.tcc.dto.Node
+import uff.br.tcc.dto.term.AtomicTerm
 import uff.br.tcc.enum.NodeTypeEnum
-import uff.br.tcc.model.Diagram
-import uff.br.tcc.model.Edge
-import uff.br.tcc.model.Node
-import uff.br.tcc.model.term.AtomicTerm
 import uff.br.tcc.utils.atomicDiagram
 import uff.br.tcc.utils.normalIntersectionDiagram
 
@@ -20,7 +21,11 @@ class HomomorphismValidatorTest {
         val leftDiagram = atomicDiagram("R")
         val rightDiagram = atomicDiagram("R")
 
-        assertTrue(homomorphismValidator.validate(leftDiagram, rightDiagram))
+        assertTrue(
+            homomorphismValidator.validate(
+                HomomorphismValidatorRequest(leftDiagram, rightDiagram)
+            )
+        )
     }
 
     @Test
@@ -28,7 +33,7 @@ class HomomorphismValidatorTest {
         val leftDiagram = normalIntersectionDiagram("R", "S")
         val rightDiagram = atomicDiagram("R")
 
-        assertTrue(homomorphismValidator.validate(leftDiagram, rightDiagram))
+        assertTrue(homomorphismValidator.validate(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
     }
 
     @Test
@@ -36,7 +41,7 @@ class HomomorphismValidatorTest {
         val leftDiagram = normalIntersectionDiagram("R", "S")
         val rightDiagram = atomicDiagram("S")
 
-        assertTrue(homomorphismValidator.validate(leftDiagram, rightDiagram))
+        assertTrue(homomorphismValidator.validate(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
     }
 
     @Test
@@ -44,7 +49,7 @@ class HomomorphismValidatorTest {
         val rightDiagram = normalIntersectionDiagram("R", "S")
         val leftDiagram = atomicDiagram("R")
 
-        assertFalse(homomorphismValidator.validate(leftDiagram, rightDiagram))
+        assertFalse(homomorphismValidator.validate(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
     }
 
     @Test
@@ -52,7 +57,7 @@ class HomomorphismValidatorTest {
         val rightDiagram = normalIntersectionDiagram("R", "S")
         val leftDiagram = atomicDiagram("S")
 
-        assertFalse(homomorphismValidator.validate(leftDiagram, rightDiagram))
+        assertFalse(homomorphismValidator.validate(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
     }
 
     @Test
@@ -60,8 +65,8 @@ class HomomorphismValidatorTest {
         val rightDiagram = normalIntersectionDiagram("R", "S")
         val leftDiagram = normalIntersectionDiagram("S", "R")
 
-        assertTrue(homomorphismValidator.validate(leftDiagram, rightDiagram))
-        assertTrue(homomorphismValidator.validate(rightDiagram, leftDiagram))
+        assertTrue(homomorphismValidator.validate(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
+        assertTrue(homomorphismValidator.validate(HomomorphismValidatorRequest(rightDiagram, leftDiagram)))
     }
 
     @Test
@@ -69,7 +74,7 @@ class HomomorphismValidatorTest {
         val rightDiagram = normalIntersectionDiagram("R", "R")
         val leftDiagram = normalIntersectionDiagram("R", "S")
 
-        assertTrue(homomorphismValidator.validate(leftDiagram, rightDiagram))
+        assertTrue(homomorphismValidator.validate(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
     }
 
     @Test
@@ -110,15 +115,15 @@ class HomomorphismValidatorTest {
         val leftDiagram = buildLeftDiagram()
         val rightDiagram = buildRightDiagram()
 
-        assertFalse(homomorphismValidator.validate(leftDiagram, rightDiagram))
+        assertFalse(homomorphismValidator.validate(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
     }
 
     @Test
     fun `should validate that complex diagram H is included in diagram G but H is not included in G`() {
         val diagramG = buildDiagramG()
         val diagramH = buildDiagramH()
-        assertTrue(homomorphismValidator.validate(diagramG, diagramH))
-        assertFalse(homomorphismValidator.validate(diagramH, diagramG))
+        assertTrue(homomorphismValidator.validate(HomomorphismValidatorRequest(diagramG, diagramH)))
+        assertFalse(homomorphismValidator.validate(HomomorphismValidatorRequest(diagramH, diagramG)))
     }
 
     private fun buildDiagramG(): Diagram {

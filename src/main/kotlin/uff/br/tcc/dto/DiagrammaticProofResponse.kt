@@ -1,4 +1,4 @@
-package uff.br.tcc.model
+package uff.br.tcc.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
@@ -12,3 +12,5 @@ class DiagrammaticProofResponse(
 
     val isHomomorphic: Boolean
 )
+
+data class DiagrammaticProof(val diagrams: MutableList<Diagram>)

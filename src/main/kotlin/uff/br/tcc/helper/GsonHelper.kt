@@ -9,7 +9,7 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParseException
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
-import uff.br.tcc.model.term.ITerm
+import uff.br.tcc.dto.term.ITerm
 import java.lang.reflect.Type
 
 fun buildGson(): Gson = GsonBuilder().registerTypeAdapter(ITerm::class.java, InterfaceAdapter<ITerm>())

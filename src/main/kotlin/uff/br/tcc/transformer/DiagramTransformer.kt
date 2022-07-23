@@ -2,15 +2,15 @@ package uff.br.tcc.transformer
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import uff.br.tcc.dto.Diagram
+import uff.br.tcc.dto.Edge
+import uff.br.tcc.dto.term.NonAtomicTerm
 import uff.br.tcc.enum.OperationEnum
 import uff.br.tcc.enum.StepDescriptionEnum
 import uff.br.tcc.extensions.getFirstEdgeWithNonAtomicTerm
 import uff.br.tcc.extensions.transformComposition
 import uff.br.tcc.extensions.transformIntersection
 import uff.br.tcc.extensions.transformInverse
-import uff.br.tcc.model.Diagram
-import uff.br.tcc.model.Edge
-import uff.br.tcc.model.term.NonAtomicTerm
 
 @Component
 class DiagramTransformer {

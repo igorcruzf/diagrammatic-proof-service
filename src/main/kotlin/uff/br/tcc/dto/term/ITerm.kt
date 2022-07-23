@@ -1,4 +1,4 @@
-package uff.br.tcc.model.term
+package uff.br.tcc.dto.term
 
 sealed interface ITerm {
     fun name(): String

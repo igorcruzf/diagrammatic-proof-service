@@ -1,8 +1,8 @@
 package uff.br.tcc.extensions
 
+import uff.br.tcc.dto.Diagram
+import uff.br.tcc.dto.Edge
 import uff.br.tcc.helper.buildGson
-import uff.br.tcc.model.Diagram
-import uff.br.tcc.model.Edge
 import java.util.stream.Collectors
 
 fun Diagram.deepCopy(): Diagram {

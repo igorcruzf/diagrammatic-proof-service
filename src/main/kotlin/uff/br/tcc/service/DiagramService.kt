@@ -3,10 +3,11 @@ package uff.br.tcc.service
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import uff.br.tcc.dto.DiagrammaticProof
+import uff.br.tcc.dto.DiagrammaticProofResponse
+import uff.br.tcc.dto.HomomorphismValidatorRequest
 import uff.br.tcc.extensions.deepCopy
 import uff.br.tcc.extensions.hasAnyNonAtomicTerm
-import uff.br.tcc.model.DiagrammaticProof
-import uff.br.tcc.model.DiagrammaticProofResponse
 import uff.br.tcc.transformer.DiagramTransformer
 import uff.br.tcc.transformer.RequestTransformer
 
@@ -30,8 +31,11 @@ class DiagramService(
         logger.info("All diagrams in right diagrammatic proof = $rightDiagrammaticProof.")
 
         val isHomomorphic = homomorphismValidator.validate(
-            leftDiagrammaticProof.diagrams.last(),
-            rightDiagrammaticProof.diagrams.last()
+            HomomorphismValidatorRequest(
+                leftDiagram = leftDiagrammaticProof.diagrams.last(),
+                rightDiagram = rightDiagrammaticProof.diagrams.last()
+            )
+
         )
 
         logger.info(

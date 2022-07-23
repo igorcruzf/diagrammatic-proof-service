@@ -1,7 +1,7 @@
-package uff.br.tcc.model
+package uff.br.tcc.dto
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import uff.br.tcc.model.term.ITerm
+import uff.br.tcc.dto.term.ITerm
 import java.util.UUID
 
 data class Edge(

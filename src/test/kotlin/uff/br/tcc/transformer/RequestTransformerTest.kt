@@ -7,11 +7,11 @@ import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import uff.br.tcc.dto.term.AtomicTerm
+import uff.br.tcc.dto.term.NonAtomicTerm
 import uff.br.tcc.enum.NodeTypeEnum
 import uff.br.tcc.enum.OperationEnum
 import uff.br.tcc.enum.StepDescriptionEnum
-import uff.br.tcc.model.term.AtomicTerm
-import uff.br.tcc.model.term.NonAtomicTerm
 
 class RequestTransformerTest {
 

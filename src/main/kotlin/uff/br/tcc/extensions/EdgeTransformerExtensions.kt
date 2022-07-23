@@ -1,9 +1,9 @@
 package uff.br.tcc.extensions
 
+import uff.br.tcc.dto.Edge
+import uff.br.tcc.dto.Node
+import uff.br.tcc.dto.term.NonAtomicTerm
 import uff.br.tcc.enum.NodeTypeEnum
-import uff.br.tcc.model.Edge
-import uff.br.tcc.model.Node
-import uff.br.tcc.model.term.NonAtomicTerm
 import java.security.InvalidParameterException
 import java.util.UUID
 
