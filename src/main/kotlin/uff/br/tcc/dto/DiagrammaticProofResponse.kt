@@ -10,8 +10,8 @@ class DiagrammaticProofResponse(
     @JsonProperty("right_diagrammatic_proof")
     val rightDiagrammaticProof: DiagrammaticProof,
 
-    @JsonProperty("countermodel_response")
-    val countermodelResponse: CountermodelResponse
+    @JsonProperty("countermodel")
+    val countermodel: CountermodelResponse
 )
 
 data class DiagrammaticProof(

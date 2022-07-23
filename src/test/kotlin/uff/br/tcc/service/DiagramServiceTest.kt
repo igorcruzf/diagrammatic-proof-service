@@ -66,11 +66,11 @@ class DiagramServiceTest {
     fun `should transform expression in two diagrammatic proofs with normal diagrams and should be homomorphic in both directions`() {
         val expression = "(R comp S)int T inc ((R int(T comp (Sinv))) comp (((Rinv) comp T) int S)) int T"
         val diagrammaticProofResponse = diagramService.transformDiagramsAndValidateHomomorphism(expression)
-        assertTrue(diagrammaticProofResponse.countermodelResponse.isHomomorphic!!)
+        assertTrue(diagrammaticProofResponse.countermodel.isHomomorphic!!)
 
         val expression2 = "((R int(T comp (Sinv))) comp (((Rinv) comp T) int S)) int T inc (R comp S)int T"
         val diagrammaticProofResponse2 = diagramService.transformDiagramsAndValidateHomomorphism(expression2)
-        assertTrue(diagrammaticProofResponse2.countermodelResponse.isHomomorphic!!)
+        assertTrue(diagrammaticProofResponse2.countermodel.isHomomorphic!!)
     }
 
     fun assertEdges(firstEdges: List<Edge>, secondEdges: List<Edge>) {

@@ -50,7 +50,7 @@ class DiagramService(
         return DiagrammaticProofResponse(
             leftDiagrammaticProof = leftDiagrammaticProof,
             rightDiagrammaticProof = rightDiagrammaticProof,
-            countermodelResponse = countermodelResponse
+            countermodel = countermodelResponse
         )
     }
 
