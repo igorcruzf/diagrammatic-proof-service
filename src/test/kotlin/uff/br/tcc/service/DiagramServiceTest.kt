@@ -19,8 +19,9 @@ class DiagramServiceTest {
     private val requestTransformer = RequestTransformer()
     private val diagramTransformer = DiagramTransformer()
     private val homomorphismValidator = HomomorphismValidator()
+    private val countermodelService = CountermodelService()
 
-    private val diagramService = DiagramService(diagramTransformer, requestTransformer, homomorphismValidator)
+    private val diagramService = DiagramService(diagramTransformer, requestTransformer, homomorphismValidator, countermodelService)
 
     @Test
     fun `should transform R intersection S in normal form`() {
@@ -62,14 +63,14 @@ class DiagramServiceTest {
     }
 
     @Test
-    fun `should transform expression in two diagrammatic proofs with normaldiagrams and should be homomorphic in both directions`() {
+    fun `should transform expression in two diagrammatic proofs with normal diagrams and should be homomorphic in both directions`() {
         val expression = "(R comp S)int T inc ((R int(T comp (Sinv))) comp (((Rinv) comp T) int S)) int T"
         val diagrammaticProofResponse = diagramService.transformDiagramsAndValidateHomomorphism(expression)
-        assertTrue(diagrammaticProofResponse.isHomomorphic)
+        assertTrue(diagrammaticProofResponse.countermodel.isHomomorphic!!)
 
         val expression2 = "((R int(T comp (Sinv))) comp (((Rinv) comp T) int S)) int T inc (R comp S)int T"
         val diagrammaticProofResponse2 = diagramService.transformDiagramsAndValidateHomomorphism(expression2)
-        assertTrue(diagrammaticProofResponse2.isHomomorphic)
+        assertTrue(diagrammaticProofResponse2.countermodel.isHomomorphic!!)
     }
 
     fun assertEdges(firstEdges: List<Edge>, secondEdges: List<Edge>) {

@@ -10,7 +10,19 @@ class DiagrammaticProofResponse(
     @JsonProperty("right_diagrammatic_proof")
     val rightDiagrammaticProof: DiagrammaticProof,
 
-    val isHomomorphic: Boolean
+    @JsonProperty("countermodel")
+    val countermodel: CountermodelResponse
 )
 
-data class DiagrammaticProof(val diagrams: MutableList<Diagram>)
+data class DiagrammaticProof(
+    val diagrams: MutableList<Diagram>
+)
+
+data class CountermodelResponse(
+    val universe: Map<String, Int>,
+
+    val relations: Map<String, List<Pair<Int, Int>>>,
+
+    @JsonProperty("is_homomorphic")
+    var isHomomorphic: Boolean? = null
+)

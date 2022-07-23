@@ -18,5 +18,8 @@ data class Diagram(
     var createdEdges: List<Edge>? = null,
 
     @JsonProperty("created_node")
-    var createdNode: Node? = null
+    var createdNode: Node? = null,
+
+    @JsonProperty("countermodel_relations")
+    var countermodelRelations: Map<String, List<Pair<Int, Int>>>? = null
 )

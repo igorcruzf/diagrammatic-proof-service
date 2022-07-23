@@ -15,7 +15,8 @@ import uff.br.tcc.transformer.RequestTransformer
 class DiagramService(
     @Autowired private val diagramTransformer: DiagramTransformer,
     @Autowired private val requestTransformer: RequestTransformer,
-    @Autowired private val homomorphismValidator: HomomorphismValidator
+    @Autowired private val homomorphismValidator: HomomorphismValidator,
+    @Autowired private val countermodelService: CountermodelService
 ) {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
@@ -30,22 +31,26 @@ class DiagramService(
         addDiagramsUntilNormalForm(rightDiagrammaticProof)
         logger.info("All diagrams in right diagrammatic proof = $rightDiagrammaticProof.")
 
-        val isHomomorphic = homomorphismValidator.validate(
-            HomomorphismValidatorRequest(
-                leftDiagram = leftDiagrammaticProof.diagrams.last(),
-                rightDiagram = rightDiagrammaticProof.diagrams.last()
-            )
+        val countermodelResponse = countermodelService.createCountermodel(leftDiagrammaticProof, rightDiagrammaticProof)
 
-        )
+        if (countermodelResponse.isHomomorphic!!) {
+            homomorphismValidator.validate(
+                HomomorphismValidatorRequest(
+                    leftDiagram = leftDiagrammaticProof.diagrams.last(),
+                    rightDiagram = rightDiagrammaticProof.diagrams.last()
+                )
+            )
+        }
 
         logger.info(
-            "Homomorphism = $isHomomorphic with left diagram ${leftDiagrammaticProof.diagrams.last()}" +
+            "Homomorphism = ${countermodelResponse.isHomomorphic} " +
+                "with left diagram ${leftDiagrammaticProof.diagrams.last()}" +
                 " and right diagram ${rightDiagrammaticProof.diagrams.last()}."
         )
         return DiagrammaticProofResponse(
             leftDiagrammaticProof = leftDiagrammaticProof,
             rightDiagrammaticProof = rightDiagrammaticProof,
-            isHomomorphic = isHomomorphic
+            countermodel = countermodelResponse
         )
     }
 
