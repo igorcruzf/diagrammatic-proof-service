@@ -19,6 +19,6 @@ data class NonAtomicTerm(
 
     override fun name(): String {
         val stringRightTerm = rightTerm?.let { " $rightTerm" } ?: ""
-        return "($leftTerm" + operation.symbol() + "$stringRightTerm)"
+        return "($leftTerm " + operation.symbol() + "$stringRightTerm)"
     }
 }
