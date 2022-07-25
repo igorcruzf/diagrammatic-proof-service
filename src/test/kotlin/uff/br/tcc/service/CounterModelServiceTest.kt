@@ -16,11 +16,29 @@ class CounterModelServiceTest {
     private val diagramService = DiagramService(diagramTransformer, requestTransformer, homomorphismValidator, countermodelService)
 
     @Test
-    fun `should transform inverse of R in normal form`() {
+    fun `should validate that inverse of R is included in itself`() {
         val diagrammaticProof = buildDiagrammaticProofWithInverse("R")
         diagramService.addDiagramsUntilNormalForm(diagrammaticProof)
 
         assert(countermodelService.createCountermodel(diagrammaticProof, diagrammaticProof).isHomomorphic!!)
+    }
+
+    @Test
+    fun `should validate that R is included in itself`() {
+        val diagrammaticProof = buildDiagrammaticProofWithInverse("R")
+        diagramService.addDiagramsUntilNormalForm(diagrammaticProof)
+
+        assert(countermodelService.createCountermodel(diagrammaticProof, diagrammaticProof).isHomomorphic!!)
+    }
+
+    @Test
+    fun `should validate that R is not included in S`() {
+        val diagrams = requestTransformer.splitToDiagrams("R inc S")
+        val leftDiagrammaticProof = requestTransformer.transformToDiagrammaticProof(diagrams.first())
+        diagramService.addDiagramsUntilNormalForm(leftDiagrammaticProof)
+        val rightDiagrammaticProof = requestTransformer.transformToDiagrammaticProof(diagrams.last())
+        diagramService.addDiagramsUntilNormalForm(rightDiagrammaticProof)
+        assertFalse(countermodelService.createCountermodel(leftDiagrammaticProof, rightDiagrammaticProof).isHomomorphic!!)
     }
 
     @Test

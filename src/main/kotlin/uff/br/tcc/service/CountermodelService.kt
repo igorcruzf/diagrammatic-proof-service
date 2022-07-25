@@ -18,7 +18,7 @@ class CountermodelService {
         rightDiagrammaticProof: DiagrammaticProof
     ): CountermodelResponse {
         logger.info("Initializing countermodel.")
-        val countermodel = initializeCountermodel(leftDiagrammaticProof)
+        val countermodel = initializeCountermodel(leftDiagrammaticProof, rightDiagrammaticProof)
 
         var leftRelations = countermodel.relations
         for (diagram in leftDiagrammaticProof.diagrams.reversed()) {
@@ -39,8 +39,13 @@ class CountermodelService {
         return countermodel
     }
 
-    private fun initializeCountermodel(leftDiagrammaticProof: DiagrammaticProof): CountermodelResponse {
+    private fun initializeCountermodel(
+        leftDiagrammaticProof: DiagrammaticProof,
+        rightDiagrammaticProof: DiagrammaticProof
+    ): CountermodelResponse {
         val leftNormalFormDiagram = leftDiagrammaticProof.diagrams.last()
+
+        val rightNormalFormDiagram = rightDiagrammaticProof.diagrams.last()
 
         val universeVariables = leftNormalFormDiagram.nodes.mapIndexed { index, node ->
             node.name to index
@@ -56,14 +61,26 @@ class CountermodelService {
             }
         }.toMap()
 
+        val rightRelations = rightNormalFormDiagram.edges.map { (it.label as AtomicTerm).name }.distinct().filter {
+            !relations.contains(it)
+        }
+
+        val allInitialRelations = if (rightRelations.isEmpty()) {
+            initialRelations
+        } else {
+            initialRelations + rightRelations.map {
+                it to listOf(EMPTY_SET_VALUE to EMPTY_SET_VALUE)
+            }
+        }
+
         logger.info(
-            "Universe of countermodel = ${universeVariables.values}, relations = $initialRelations, for diagram with " +
-                "initial label = ${leftDiagrammaticProof.diagrams.first().edges.first().label.name()}"
+            "Universe of countermodel = ${universeVariables.values}, relations = $allInitialRelations, " +
+                "for diagram with initial label = ${leftDiagrammaticProof.diagrams.first().edges.first().label.name()}"
         )
 
         return CountermodelResponse(
             universeVariables,
-            initialRelations
+            allInitialRelations
         )
     }
 
