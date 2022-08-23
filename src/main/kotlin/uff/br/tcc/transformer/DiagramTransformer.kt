@@ -3,10 +3,12 @@ package uff.br.tcc.transformer
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uff.br.tcc.dto.Diagram
+import uff.br.tcc.dto.DiagrammaticProof
 import uff.br.tcc.dto.Edge
 import uff.br.tcc.dto.term.NonAtomicTerm
 import uff.br.tcc.enum.OperationEnum
 import uff.br.tcc.enum.StepDescriptionEnum
+import uff.br.tcc.extensions.deepCopy
 import uff.br.tcc.extensions.getFirstEdgeWithNonAtomicTerm
 import uff.br.tcc.extensions.transformComposition
 import uff.br.tcc.extensions.transformIntersection
@@ -18,9 +20,9 @@ class DiagramTransformer {
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
     fun transformDiagram(diagram: Diagram) {
-        logger.info("Transforming diagram $diagram.")
+        logger.debug("Transforming diagram $diagram.")
         val edge = diagram.edges.getFirstEdgeWithNonAtomicTerm()
-        logger.info("First non atomic edge is $edge.")
+        logger.debug("First non atomic edge is $edge.")
         diagram.edges.remove(edge)
         val nonAtomicTerm = edge.label as NonAtomicTerm
 
@@ -29,11 +31,11 @@ class DiagramTransformer {
             OperationEnum.INTERSECTION -> transformIntersection(diagram = diagram, edge = edge)
             OperationEnum.INVERSE -> transformInverse(diagram = diagram, edge = edge)
         }
-        logger.info("Diagram transformed to $diagram.")
+        logger.debug("Diagram transformed to $diagram.")
     }
 
     fun transformComposition(diagram: Diagram, edge: Edge) {
-        logger.info("Transforming composition in edge $edge.")
+        logger.debug("Transforming composition in edge $edge.")
         diagram.removedEdge = edge
         val (firstEdge, secondEdge, node) = edge.transformComposition()
         diagram.createdEdges = listOf(firstEdge, secondEdge)
@@ -45,7 +47,7 @@ class DiagramTransformer {
     }
 
     fun transformIntersection(diagram: Diagram, edge: Edge) {
-        logger.info("Transforming intersection in edge $edge.")
+        logger.debug("Transforming intersection in edge $edge.")
         diagram.removedEdge = edge
         val (firstEdge, secondEdge) = edge.transformIntersection()
         diagram.createdEdges = listOf(firstEdge, secondEdge)
@@ -55,11 +57,32 @@ class DiagramTransformer {
     }
 
     fun transformInverse(diagram: Diagram, edge: Edge) {
-        logger.info("Transforming inverse in edge $edge.")
+        logger.debug("Transforming inverse in edge $edge.")
         diagram.removedEdge = edge
         val newEdge = edge.transformInverse()
         diagram.createdEdges = listOf(newEdge)
         diagram.edges.add(newEdge)
         diagram.stepDescription = StepDescriptionEnum.REMOVE_INVERSE.name
+    }
+
+    fun addHypothesis(diagram: Diagram, hypothesisDiagram: Pair<DiagrammaticProof, DiagrammaticProof>): Diagram {
+        val diagramWithHypothesis = diagram.deepCopy()
+
+        diagramWithHypothesis.edges.add(
+            Edge(
+                leftNode = diagramWithHypothesis.nodes.first { node ->
+                    node.name == hypothesisDiagram.first.diagrams.last().nodes.first { it.name == "input" }.imageName
+                },
+                rightNode = diagramWithHypothesis.nodes.first { node ->
+                    node.name == hypothesisDiagram.first.diagrams.last().nodes.first { it.name == "output" }.imageName
+                },
+                label = hypothesisDiagram.second.diagrams.first().edges.first().label.deepCopy()
+            )
+        )
+
+        diagramWithHypothesis.stepDescription = "Adding ${hypothesisDiagram.second.diagrams.first().edges.first().label.name()}" +
+            " with hypothesis"
+
+        return diagramWithHypothesis
     }
 }

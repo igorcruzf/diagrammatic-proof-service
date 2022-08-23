@@ -17,7 +17,7 @@ class CountermodelService {
         leftDiagrammaticProof: DiagrammaticProof,
         rightDiagrammaticProof: DiagrammaticProof
     ): CountermodelResponse {
-        logger.info("Initializing countermodel.")
+        logger.debug("Initializing countermodel.")
         val countermodel = initializeCountermodel(leftDiagrammaticProof, rightDiagrammaticProof)
 
         var leftRelations = countermodel.relations
@@ -73,7 +73,7 @@ class CountermodelService {
             }
         }
 
-        logger.info(
+        logger.debug(
             "Universe of countermodel = ${universeVariables.values}, relations = $allInitialRelations, " +
                 "for diagram with initial label = ${leftDiagrammaticProof.diagrams.first().edges.first().label.name()}"
         )
