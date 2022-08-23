@@ -104,11 +104,11 @@ class DiagramService(
 
         val normalizedHypotheses = normalizeHypotheses(hypotheses)
 
-        for (i in (0..100)) {
+        for (i in (0..MAX_LOOPS)) {
             logger.info("Trying to apply hypothesis in loop $i")
             diagrammaticProofsToApplyHypothesis = diagrammaticProofsToApplyHypothesis.map {
                 normalizedHypotheses.mapNotNull { (leftHypothesis, rightHypothesis) ->
-                    val isHypothesisApplicable = hypothesisService.applyHypothesis(
+                    val isHypothesisApplicable = hypothesisService.validate(
                         HomomorphismValidatorRequest(
                             leftDiagram = it.diagrams.last(),
                             rightDiagram = leftHypothesis.diagrams.last()
@@ -143,7 +143,7 @@ class DiagramService(
     ): DiagrammaticProof {
         val newLeftDiagrammaticProof = leftDiagrammaticProof.deepCopy()
         newLeftDiagrammaticProof.diagrams.add(
-            diagramTransformer.addHypothesis(
+            hypothesisService.addHypothesis(
                 leftDiagrammaticProof.diagrams.last(),
                 Pair(leftHypothesis, rightHypothesis)
             )
@@ -165,5 +165,9 @@ class DiagramService(
         addDiagramsUntilNormalForm(rightHypothesisDiagramsProof)
         logger.debug("All diagrams in right diagrammatic proof = $rightHypothesisDiagramsProof.")
         Pair(leftHypothesisDiagramsProof, rightHypothesisDiagramsProof)
+    }
+
+    companion object {
+        const val MAX_LOOPS = 15
     }
 }

@@ -144,4 +144,26 @@ class CounterModelServiceTest {
         diagramService.addDiagramsUntilNormalForm(rightDiagrammaticProof)
         assertFalse(countermodelService.createCountermodel(leftDiagrammaticProof, rightDiagrammaticProof).isHomomorphic!!)
     }
+
+    @Test
+    fun `should validate that (A comp B) int A is included in A`() {
+        val diagrams = requestTransformer
+            .splitToDiagrams("(A comp B) int A inc A")
+        val leftDiagrammaticProof = requestTransformer.transformToDiagrammaticProof(diagrams.first())
+        diagramService.addDiagramsUntilNormalForm(leftDiagrammaticProof)
+        val rightDiagrammaticProof = requestTransformer.transformToDiagrammaticProof(diagrams.last())
+        diagramService.addDiagramsUntilNormalForm(rightDiagrammaticProof)
+        assert(countermodelService.createCountermodel(leftDiagrammaticProof, rightDiagrammaticProof).isHomomorphic!!)
+    }
+
+    @Test
+    fun `should validate that (R comp (S int T)) is included in (R comp S) int (R comp T)`() {
+        val diagrams = requestTransformer
+            .splitToDiagrams("R comp (S int T) inc (R comp S) int (R comp T)")
+        val leftDiagrammaticProof = requestTransformer.transformToDiagrammaticProof(diagrams.first())
+        diagramService.addDiagramsUntilNormalForm(leftDiagrammaticProof)
+        val rightDiagrammaticProof = requestTransformer.transformToDiagrammaticProof(diagrams.last())
+        diagramService.addDiagramsUntilNormalForm(rightDiagrammaticProof)
+        assert(countermodelService.createCountermodel(leftDiagrammaticProof, rightDiagrammaticProof).isHomomorphic!!)
+    }
 }

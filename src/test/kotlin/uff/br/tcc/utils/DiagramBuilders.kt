@@ -72,7 +72,7 @@ fun normalCompositionDiagram(leftName: String, rightName: String): Diagram {
     val outputNode = Node(name = "output", type = NodeTypeEnum.OUTPUT)
 
     return Diagram(
-        nodes = mutableListOf(inputNode, outputNode),
+        nodes = mutableListOf(inputNode, outputNode, intermediateNode),
         edges = mutableListOf(
             Edge(
                 leftNode = inputNode,

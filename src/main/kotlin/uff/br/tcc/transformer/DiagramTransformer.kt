@@ -3,12 +3,10 @@ package uff.br.tcc.transformer
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uff.br.tcc.dto.Diagram
-import uff.br.tcc.dto.DiagrammaticProof
 import uff.br.tcc.dto.Edge
 import uff.br.tcc.dto.term.NonAtomicTerm
 import uff.br.tcc.enum.OperationEnum
 import uff.br.tcc.enum.StepDescriptionEnum
-import uff.br.tcc.extensions.deepCopy
 import uff.br.tcc.extensions.getFirstEdgeWithNonAtomicTerm
 import uff.br.tcc.extensions.transformComposition
 import uff.br.tcc.extensions.transformIntersection
@@ -63,26 +61,5 @@ class DiagramTransformer {
         diagram.createdEdges = listOf(newEdge)
         diagram.edges.add(newEdge)
         diagram.stepDescription = StepDescriptionEnum.REMOVE_INVERSE.name
-    }
-
-    fun addHypothesis(diagram: Diagram, hypothesisDiagram: Pair<DiagrammaticProof, DiagrammaticProof>): Diagram {
-        val diagramWithHypothesis = diagram.deepCopy()
-
-        diagramWithHypothesis.edges.add(
-            Edge(
-                leftNode = diagramWithHypothesis.nodes.first { node ->
-                    node.name == hypothesisDiagram.first.diagrams.last().nodes.first { it.name == "input" }.imageName
-                },
-                rightNode = diagramWithHypothesis.nodes.first { node ->
-                    node.name == hypothesisDiagram.first.diagrams.last().nodes.first { it.name == "output" }.imageName
-                },
-                label = hypothesisDiagram.second.diagrams.first().edges.first().label.deepCopy()
-            )
-        )
-
-        diagramWithHypothesis.stepDescription = "Adding ${hypothesisDiagram.second.diagrams.first().edges.first().label.name()}" +
-            " with hypothesis"
-
-        return diagramWithHypothesis
     }
 }

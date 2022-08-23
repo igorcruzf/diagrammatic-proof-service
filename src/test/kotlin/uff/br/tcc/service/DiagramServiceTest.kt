@@ -1,6 +1,7 @@
 package uff.br.tcc.service
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -74,7 +75,39 @@ class DiagramServiceTest {
         assertTrue(diagrammaticProofResponse2.countermodel.isHomomorphic!!)
     }
 
-    fun assertEdges(firstEdges: List<Edge>, secondEdges: List<Edge>) {
+    @Test
+    fun `should apply hypothesis to transform in homomorphic diagrams when hypothesis is equal expression`() {
+        val expression = "AcompB inc A"
+        val hypothesis = listOf("AcompB inc A")
+        val diagrammaticProofResponse = diagramService.transformDiagramsAndValidateHomomorphism(expression, hypothesis)
+        assertTrue(diagrammaticProofResponse.countermodel.isHomomorphic!!)
+    }
+
+    @Test
+    fun `should apply multiple hypotheses to transform in homomorphic diagrams`() {
+        val expression = "A inc B"
+        val hypotheses = listOf("A inc C", "C inc D", "D inc E comp F", "E comp F inc B")
+        val diagrammaticProofResponse = diagramService.transformDiagramsAndValidateHomomorphism(expression, hypotheses)
+        assertTrue(diagrammaticProofResponse.countermodel.isHomomorphic!!)
+    }
+
+//    @Test
+    fun `should apply multiple hypotheses to transform but doesnt find homomorphism`() {
+        val expression = "A inc B"
+        val hypotheses = listOf("A inc C", "C inc A")
+        val diagrammaticProofResponse = diagramService.transformDiagramsAndValidateHomomorphism(expression, hypotheses)
+        assertFalse(diagrammaticProofResponse.countermodel.isHomomorphic!!)
+    }
+
+    @Test
+    fun `should not apply hypotheses`() {
+        val expression = "A inc B"
+        val hypotheses = listOf("B inc C", "C inc D", "D inc E comp F", "E comp F inc B")
+        val diagrammaticProofResponse = diagramService.transformDiagramsAndValidateHomomorphism(expression, hypotheses)
+        assertFalse(diagrammaticProofResponse.countermodel.isHomomorphic!!)
+    }
+
+    private fun assertEdges(firstEdges: List<Edge>, secondEdges: List<Edge>) {
         assertEquals(firstEdges.size, secondEdges.size)
         firstEdges.forEach { firstEdge ->
             assertNotNull(

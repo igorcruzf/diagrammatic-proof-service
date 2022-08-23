@@ -11,3 +11,6 @@ data class Node(
     @JsonProperty("image_name")
     var imageName: String? = null
 )
+
+const val INPUT_NODE_NAME = "input"
+const val OUTPUT_NODE_NAME = "output"

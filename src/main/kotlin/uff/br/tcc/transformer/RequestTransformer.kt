@@ -5,7 +5,9 @@ import org.springframework.stereotype.Component
 import uff.br.tcc.dto.Diagram
 import uff.br.tcc.dto.DiagrammaticProof
 import uff.br.tcc.dto.Edge
+import uff.br.tcc.dto.INPUT_NODE_NAME
 import uff.br.tcc.dto.Node
+import uff.br.tcc.dto.OUTPUT_NODE_NAME
 import uff.br.tcc.dto.term.AtomicTerm
 import uff.br.tcc.dto.term.ITerm
 import uff.br.tcc.dto.term.NonAtomicTerm
@@ -54,8 +56,8 @@ class RequestTransformer {
 
     fun transformToDiagrammaticProof(expression: String): DiagrammaticProof {
         logger.info("Transforming expression $expression in a diagrammatic proof.")
-        val inputNode = Node("input", NodeTypeEnum.INPUT)
-        val outputNode = Node("output", NodeTypeEnum.OUTPUT)
+        val inputNode = Node(INPUT_NODE_NAME, NodeTypeEnum.INPUT)
+        val outputNode = Node(OUTPUT_NODE_NAME, NodeTypeEnum.OUTPUT)
         validateParenthesisCount(expression)
         return DiagrammaticProof(
             mutableListOf(
