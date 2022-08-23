@@ -89,9 +89,9 @@ class CountermodelService {
         leftDiagrammaticProof: DiagrammaticProof,
         rightRelations: Map<String, List<Pair<Int, Int>>>,
         rightDiagrammaticProof: DiagrammaticProof,
-    ) = leftRelations[leftDiagrammaticProof.diagrams.first().edges.first().label.name()]!!
+    ) = rightRelations[rightDiagrammaticProof.diagrams.first().edges.first().label.name()]!!
         .containsAll(
-            rightRelations[rightDiagrammaticProof.diagrams.first().edges.first().label.name()]!!
+            leftRelations[leftDiagrammaticProof.diagrams.first().edges.first().label.name()]!!
         )
 
     private fun applyOperation(
