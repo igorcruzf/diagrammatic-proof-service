@@ -168,6 +168,6 @@ class DiagramService(
     }
 
     companion object {
-        const val MAX_LOOPS = 15
+        const val MAX_LOOPS = 5
     }
 }
