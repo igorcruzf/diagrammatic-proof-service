@@ -18,9 +18,9 @@ class DiagramTransformer {
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
     fun transformDiagram(diagram: Diagram) {
-        logger.info("Transforming diagram $diagram.")
+        logger.debug("Transforming diagram $diagram.")
         val edge = diagram.edges.getFirstEdgeWithNonAtomicTerm()
-        logger.info("First non atomic edge is $edge.")
+        logger.debug("First non atomic edge is $edge.")
         diagram.edges.remove(edge)
         val nonAtomicTerm = edge.label as NonAtomicTerm
 
@@ -29,11 +29,11 @@ class DiagramTransformer {
             OperationEnum.INTERSECTION -> transformIntersection(diagram = diagram, edge = edge)
             OperationEnum.INVERSE -> transformInverse(diagram = diagram, edge = edge)
         }
-        logger.info("Diagram transformed to $diagram.")
+        logger.debug("Diagram transformed to $diagram.")
     }
 
     fun transformComposition(diagram: Diagram, edge: Edge) {
-        logger.info("Transforming composition in edge $edge.")
+        logger.debug("Transforming composition in edge $edge.")
         diagram.removedEdge = edge
         val (firstEdge, secondEdge, node) = edge.transformComposition()
         diagram.createdEdges = listOf(firstEdge, secondEdge)
@@ -45,7 +45,7 @@ class DiagramTransformer {
     }
 
     fun transformIntersection(diagram: Diagram, edge: Edge) {
-        logger.info("Transforming intersection in edge $edge.")
+        logger.debug("Transforming intersection in edge $edge.")
         diagram.removedEdge = edge
         val (firstEdge, secondEdge) = edge.transformIntersection()
         diagram.createdEdges = listOf(firstEdge, secondEdge)
@@ -55,7 +55,7 @@ class DiagramTransformer {
     }
 
     fun transformInverse(diagram: Diagram, edge: Edge) {
-        logger.info("Transforming inverse in edge $edge.")
+        logger.debug("Transforming inverse in edge $edge.")
         diagram.removedEdge = edge
         val newEdge = edge.transformInverse()
         diagram.createdEdges = listOf(newEdge)
