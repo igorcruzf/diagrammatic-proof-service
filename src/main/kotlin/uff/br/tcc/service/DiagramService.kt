@@ -15,17 +15,64 @@ import uff.br.tcc.transformer.RequestTransformer
 class DiagramService(
     private val diagramTransformer: DiagramTransformer,
     private val requestTransformer: RequestTransformer,
-    private val homomorphismValidator: HomomorphismValidator,
+    private val homomorphismFinder: HomomorphismFinder,
     private val countermodelService: CountermodelService,
     private val hypothesisService: HypothesisService
 ) {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
-    fun transformDiagramsAndValidateHomomorphism(
+    fun validateHomomorphism(
         diagramsRequest: String,
         hypotheses: List<String> = listOf()
     ): DiagrammaticProofResponse {
+        val (leftDiagrammaticProof, rightDiagrammaticProof) = transformDiagrams(diagramsRequest)
+
+        val countermodelResponse = countermodelService.createCountermodel(leftDiagrammaticProof, rightDiagrammaticProof)
+
+        if (countermodelResponse.isHomomorphic!!) {
+            homomorphismFinder.find(
+                HomomorphismValidatorRequest(
+                    leftDiagram = leftDiagrammaticProof.diagrams.last(),
+                    rightDiagram = rightDiagrammaticProof.diagrams.last()
+                )
+            )
+        } else if (hypotheses.isNotEmpty()) {
+            return validateWithHypotheses(
+                hypotheses,
+                leftDiagrammaticProof,
+                rightDiagrammaticProof,
+                countermodelResponse
+            )
+        }
+
+        return buildProofResponse(countermodelResponse, leftDiagrammaticProof, rightDiagrammaticProof)
+    }
+
+    private fun validateWithHypotheses(
+        hypotheses: List<String>,
+        leftDiagrammaticProof: DiagrammaticProof,
+        rightDiagrammaticProof: DiagrammaticProof,
+        countermodelResponse: CountermodelResponse,
+    ): DiagrammaticProofResponse {
+        val hypothesesResponse = findHomomorphismWithHypothesesOrNull(
+            hypotheses = hypotheses,
+            leftDiagrammaticProof = leftDiagrammaticProof,
+            rightDiagrammaticProof = rightDiagrammaticProof
+        )
+
+        return if (hypothesesResponse != null) {
+            homomorphismFinder.find(
+                HomomorphismValidatorRequest(
+                    leftDiagram = hypothesesResponse.first.diagrams.last(),
+                    rightDiagram = rightDiagrammaticProof.diagrams.last()
+                )
+            )
+            buildProofResponse(hypothesesResponse.second, hypothesesResponse.first, rightDiagrammaticProof)
+        } else buildProofResponse(countermodelResponse, leftDiagrammaticProof, rightDiagrammaticProof)
+    }
+
+    private fun transformDiagrams(diagramsRequest: String): Pair<DiagrammaticProof, DiagrammaticProof> {
         val diagrams = requestTransformer.splitToDiagrams(diagramsRequest)
         val leftDiagrammaticProof = requestTransformer.transformToDiagrammaticProof(diagrams.first())
         val rightDiagrammaticProof = requestTransformer.transformToDiagrammaticProof(diagrams.last())
@@ -34,35 +81,7 @@ class DiagramService(
         logger.info("All diagrams in left diagrammatic proof = $leftDiagrammaticProof.")
         addDiagramsUntilNormalForm(rightDiagrammaticProof)
         logger.info("All diagrams in right diagrammatic proof = $rightDiagrammaticProof.")
-
-        val countermodelResponse = countermodelService.createCountermodel(leftDiagrammaticProof, rightDiagrammaticProof)
-
-        if (countermodelResponse.isHomomorphic!!) {
-            homomorphismValidator.validate(
-                HomomorphismValidatorRequest(
-                    leftDiagram = leftDiagrammaticProof.diagrams.last(),
-                    rightDiagram = rightDiagrammaticProof.diagrams.last()
-                )
-            )
-        } else if (hypotheses.isNotEmpty()) {
-            val hypothesesResponse = findHomomorphismWithHypotheses(
-                hypotheses = hypotheses,
-                leftDiagrammaticProof = leftDiagrammaticProof,
-                rightDiagrammaticProof = rightDiagrammaticProof
-            )
-
-            if (hypothesesResponse != null) {
-                homomorphismValidator.validate(
-                    HomomorphismValidatorRequest(
-                        leftDiagram = hypothesesResponse.first.diagrams.last(),
-                        rightDiagram = rightDiagrammaticProof.diagrams.last()
-                    )
-                )
-                return buildProofResponse(hypothesesResponse.second, hypothesesResponse.first, rightDiagrammaticProof)
-            }
-        }
-
-        return buildProofResponse(countermodelResponse, leftDiagrammaticProof, rightDiagrammaticProof)
+        return Pair(leftDiagrammaticProof, rightDiagrammaticProof)
     }
 
     private fun buildProofResponse(
@@ -95,7 +114,7 @@ class DiagramService(
         this.diagrams.add(newDiagram)
     }
 
-    private fun findHomomorphismWithHypotheses(
+    private fun findHomomorphismWithHypothesesOrNull(
         hypotheses: List<String>,
         leftDiagrammaticProof: DiagrammaticProof,
         rightDiagrammaticProof: DiagrammaticProof
@@ -108,7 +127,7 @@ class DiagramService(
             logger.info("Trying to apply hypothesis in loop $i")
             diagrammaticProofsToApplyHypothesis = diagrammaticProofsToApplyHypothesis.map {
                 normalizedHypotheses.mapNotNull { (leftHypothesis, rightHypothesis) ->
-                    val isHypothesisApplicable = hypothesisService.validate(
+                    val isHypothesisApplicable = hypothesisService.find(
                         HomomorphismValidatorRequest(
                             leftDiagram = it.diagrams.last(),
                             rightDiagram = leftHypothesis.diagrams.last()
@@ -116,11 +135,11 @@ class DiagramService(
                     )
 
                     if (isHypothesisApplicable) {
-                        val newLeftDiagrammaticProof =
-                            createNewLeftDiagrammaticProof(it, leftHypothesis, rightHypothesis)
-
-                        val countermodelResponse = countermodelService.createCountermodel(
-                            newLeftDiagrammaticProof, rightDiagrammaticProof
+                        val (newLeftDiagrammaticProof, countermodelResponse) = applyHypothesis(
+                            diagrammaticProof = it,
+                            leftHypothesis,
+                            rightHypothesis,
+                            rightDiagrammaticProof
                         )
 
                         if (countermodelResponse.isHomomorphic!!) {
@@ -134,6 +153,24 @@ class DiagramService(
             }.flatten()
         }
         return null
+    }
+
+    private fun applyHypothesis(
+        diagrammaticProof: DiagrammaticProof,
+        leftHypothesis: DiagrammaticProof,
+        rightHypothesis: DiagrammaticProof,
+        rightDiagrammaticProof: DiagrammaticProof,
+    ): Pair<DiagrammaticProof, CountermodelResponse> {
+        val newLeftDiagrammaticProof = createNewLeftDiagrammaticProof(
+            diagrammaticProof,
+            leftHypothesis,
+            rightHypothesis
+        )
+
+        val countermodelResponse = countermodelService.createCountermodel(
+            newLeftDiagrammaticProof, rightDiagrammaticProof
+        )
+        return Pair(newLeftDiagrammaticProof, countermodelResponse)
     }
 
     private fun createNewLeftDiagrammaticProof(

@@ -7,14 +7,15 @@ import uff.br.tcc.dto.HomomorphismValidatorRequest
 import uff.br.tcc.enum.NodeTypeEnum
 
 @Component
-class HomomorphismValidator : RelaxedHomomorphismValidator() {
+class HomomorphismFinder : RelaxedHomomorphismFinder() {
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
-    override fun validate(homomorphismValidatorRequest: HomomorphismValidatorRequest): Boolean {
+    override fun find(homomorphismValidatorRequest: HomomorphismValidatorRequest): Boolean {
         logger.info(
-            "Validating leftDiagram ${homomorphismValidatorRequest.leftDiagram} and " +
+            "Finding homomorphism in leftDiagram ${homomorphismValidatorRequest.leftDiagram} and " +
                 "rightDiagram ${homomorphismValidatorRequest.rightDiagram}."
         )
+
         return isNodeImageToRightDiagramNode(
             homomorphismValidatorRequest,
             homomorphismValidatorRequest.leftDiagram.nodes.first().name,
@@ -22,15 +23,15 @@ class HomomorphismValidator : RelaxedHomomorphismValidator() {
         )
     }
 
-    override fun getAllPossibleEdgeImages(
+    override fun getPossibleEdgeImage(
         homomorphismValidatorRequest: HomomorphismValidatorRequest,
         leftDiagramEdges: List<Edge>,
         rightDiagramEdge: Edge,
         edgesPath: List<Edge>,
-    ): List<Edge> {
+    ): Edge? {
         val newEdgesPath = edgesPath.plus(rightDiagramEdge)
-        logger.info("Getting all possible images to edge $rightDiagramEdge with edges path $newEdgesPath.")
-        return leftDiagramEdges.filter { edge ->
+        logger.info("Getting one possible image to edge $rightDiagramEdge with edges path $newEdgesPath.")
+        return leftDiagramEdges.firstOrNull { edge ->
             logger.info("Analysing if nodes in $edge is an option of image to nodes in $rightDiagramEdge.")
             edge.label.name() == rightDiagramEdge.label.name() &&
                 isNodesTypeValid(rightDiagramEdge, edge) &&

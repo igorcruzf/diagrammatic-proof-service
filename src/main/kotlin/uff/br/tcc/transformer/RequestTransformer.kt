@@ -21,10 +21,6 @@ class RequestTransformer {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
-    companion object {
-        const val SUB_SET_EQUALS = "inc"
-    }
-
     fun splitToDiagrams(expression: String): List<String> {
         logger.info("Splitting expression $expression.")
         val diagrams = expression.split(SUB_SET_EQUALS)
@@ -38,27 +34,11 @@ class RequestTransformer {
         return diagrams
     }
 
-    fun validateParenthesisCount(expression: String) {
-        val openingParenthesis = expression.count {
-            it == '('
-        }
-        val closingParenthesis = expression.count {
-            it == ')'
-        }
-        if (openingParenthesis != closingParenthesis) {
-            throw InvalidParameterException(
-                "Expression '$expression' " +
-                    "should have pair parenthesis, but has $openingParenthesis '(' and $closingParenthesis ')'."
-            )
-        }
-        logger.info("Expression '$expression' has $openingParenthesis parenthesis.")
-    }
-
     fun transformToDiagrammaticProof(expression: String): DiagrammaticProof {
+        validateParenthesisCount(expression)
         logger.info("Transforming expression $expression in a diagrammatic proof.")
         val inputNode = Node(INPUT_NODE_NAME, NodeTypeEnum.INPUT)
         val outputNode = Node(OUTPUT_NODE_NAME, NodeTypeEnum.OUTPUT)
-        validateParenthesisCount(expression)
         return DiagrammaticProof(
             mutableListOf(
                 Diagram(
@@ -103,31 +83,50 @@ class RequestTransformer {
         return term
     }
 
-    fun getIndexOfLeftParenthesis(expression: String): Int {
-        var rightParenthesisCount = 1
-        var leftParenthesisIndex = 1
+    private fun validateParenthesisCount(expression: String) {
+        val openingParenthesis = expression.count {
+            it == '('
+        }
+        val closingParenthesis = expression.count {
+            it == ')'
+        }
+        if (openingParenthesis != closingParenthesis) {
+            throw InvalidParameterException(
+                "Expression '$expression' " +
+                    "should have pair parenthesis, but has $openingParenthesis '(' and $closingParenthesis ')'."
+            )
+        }
+        logger.info("Expression '$expression' has $openingParenthesis parenthesis.")
+    }
+
+    private fun getIndexOfClosingParenthesis(expression: String): Int {
+        var openingParenthesisCount = 1
+        var closingParenthesisIndex = 1
         expression.drop(1).takeWhile {
             if (it == '(') {
-                rightParenthesisCount += 1
+                openingParenthesisCount += 1
             }
             if (it == ')') {
-                rightParenthesisCount -= 1
+                openingParenthesisCount -= 1
             }
-            if (rightParenthesisCount != 0) {
-                leftParenthesisIndex += 1
+            if (openingParenthesisCount != 0) {
+                closingParenthesisIndex += 1
             }
-            rightParenthesisCount != 0
+            openingParenthesisCount != 0
         }
-        logger.info("Index of left parenthesis for first parenthesis in expression $expression = $leftParenthesisIndex")
-        return leftParenthesisIndex
+        logger.info(
+            "Index of closing parenthesis for first opening parenthesis in expression $expression = " +
+                "$closingParenthesisIndex"
+        )
+        return closingParenthesisIndex
     }
 
     fun transformTermInParenthesis(expression: String): ITerm {
         logger.info("Expression $expression starts with parenthesis.")
-        val leftParenthesisIndex = getIndexOfLeftParenthesis(expression)
-        val leftTerm = expression.take(leftParenthesisIndex).drop(1)
+        val closingParenthesisIndex = getIndexOfClosingParenthesis(expression)
+        val leftTerm = expression.take(closingParenthesisIndex).drop(1)
         logger.info("Left term = $leftTerm")
-        val operationAndRightTerm = getOperationAndRightTerm(expression, leftParenthesisIndex)
+        val operationAndRightTerm = getOperationAndRightTerm(expression, closingParenthesisIndex)
         val operation = operationAndRightTerm?.let {
             getFirstOperation(operationAndRightTerm)?.also {
                 logger.info("Operation ${it.name} is the first operation in $operationAndRightTerm.")
@@ -150,9 +149,9 @@ class RequestTransformer {
             logger.info("Right term in $operationAndRightTerm is $it.")
         }
 
-    fun getOperationAndRightTerm(expression: String, leftParenthesisIndex: Int): String? {
-        val operationAndRightTerm = if (expression.length != leftParenthesisIndex + 1) {
-            expression.removeRange(0..leftParenthesisIndex)
+    fun getOperationAndRightTerm(expression: String, closingParenthesisIndex: Int): String? {
+        val operationAndRightTerm = if (expression.length != closingParenthesisIndex + 1) {
+            expression.removeRange(0..closingParenthesisIndex)
         } else null
         logger.info("Operation and right term of expression $expression = $operationAndRightTerm.")
         return operationAndRightTerm
@@ -185,7 +184,11 @@ class RequestTransformer {
         }
     }
 
-    fun transformToNonAtomicTerm(leftTerm: String, operationEnum: OperationEnum, rightTerm: String?): NonAtomicTerm {
+    private fun transformToNonAtomicTerm(
+        leftTerm: String,
+        operationEnum: OperationEnum,
+        rightTerm: String?
+    ): NonAtomicTerm {
         logger.info("Transforming $leftTerm, ${operationEnum.name}, $rightTerm in a non atomic term.")
         return NonAtomicTerm(
             transformToTerm(leftTerm),
@@ -198,5 +201,9 @@ class RequestTransformer {
                 }
             }
         )
+    }
+
+    companion object {
+        const val SUB_SET_EQUALS = "inc"
     }
 }

@@ -21,7 +21,7 @@ class HypothesisServiceTest {
         val rightDiagram = atomicDiagram("R")
 
         Assertions.assertTrue(
-            hypothesisService.validate(
+            hypothesisService.find(
                 HomomorphismValidatorRequest(leftDiagram, rightDiagram)
             )
         )
@@ -32,7 +32,7 @@ class HypothesisServiceTest {
         val leftDiagram = normalIntersectionDiagram("R", "S")
         val rightDiagram = atomicDiagram("R")
 
-        Assertions.assertTrue(hypothesisService.validate(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
+        Assertions.assertTrue(hypothesisService.find(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
     }
 
     @Test
@@ -40,7 +40,7 @@ class HypothesisServiceTest {
         val leftDiagram = normalIntersectionDiagram("R", "S")
         val rightDiagram = atomicDiagram("S")
 
-        Assertions.assertTrue(hypothesisService.validate(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
+        Assertions.assertTrue(hypothesisService.find(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
     }
 
     @Test
@@ -48,7 +48,7 @@ class HypothesisServiceTest {
         val rightDiagram = normalIntersectionDiagram("R", "S")
         val leftDiagram = atomicDiagram("R")
 
-        Assertions.assertFalse(hypothesisService.validate(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
+        Assertions.assertFalse(hypothesisService.find(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
     }
 
     @Test
@@ -56,7 +56,7 @@ class HypothesisServiceTest {
         val rightDiagram = normalIntersectionDiagram("R", "S")
         val leftDiagram = atomicDiagram("S")
 
-        Assertions.assertFalse(hypothesisService.validate(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
+        Assertions.assertFalse(hypothesisService.find(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
     }
 
     @Test
@@ -64,8 +64,8 @@ class HypothesisServiceTest {
         val rightDiagram = normalIntersectionDiagram("R", "S")
         val leftDiagram = normalIntersectionDiagram("S", "R")
 
-        Assertions.assertTrue(hypothesisService.validate(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
-        Assertions.assertTrue(hypothesisService.validate(HomomorphismValidatorRequest(rightDiagram, leftDiagram)))
+        Assertions.assertTrue(hypothesisService.find(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
+        Assertions.assertTrue(hypothesisService.find(HomomorphismValidatorRequest(rightDiagram, leftDiagram)))
     }
 
     @Test
@@ -73,7 +73,7 @@ class HypothesisServiceTest {
         val rightDiagram = normalIntersectionDiagram("R", "R")
         val leftDiagram = normalIntersectionDiagram("R", "S")
 
-        Assertions.assertTrue(hypothesisService.validate(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
+        Assertions.assertTrue(hypothesisService.find(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
     }
 
     @Test
@@ -114,7 +114,7 @@ class HypothesisServiceTest {
         val leftDiagram = buildLeftDiagram()
         val rightDiagram = buildRightDiagram()
 
-        Assertions.assertFalse(hypothesisService.validate(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
+        Assertions.assertFalse(hypothesisService.find(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
     }
 
     @Test
@@ -147,15 +147,15 @@ class HypothesisServiceTest {
             stepDescription = ""
         )
 
-        Assertions.assertTrue(hypothesisService.validate(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
+        Assertions.assertTrue(hypothesisService.find(HomomorphismValidatorRequest(leftDiagram, rightDiagram)))
     }
 
     @Test
     fun `should validate that complex diagram H is included in diagram G but H is not included in G`() {
         val diagramG = buildDiagramG()
         val diagramH = buildDiagramH()
-        Assertions.assertTrue(hypothesisService.validate(HomomorphismValidatorRequest(diagramG, diagramH)))
-        Assertions.assertFalse(hypothesisService.validate(HomomorphismValidatorRequest(diagramH, diagramG)))
+        Assertions.assertTrue(hypothesisService.find(HomomorphismValidatorRequest(diagramG, diagramH)))
+        Assertions.assertFalse(hypothesisService.find(HomomorphismValidatorRequest(diagramH, diagramG)))
     }
 
     private fun buildDiagramG(): Diagram {

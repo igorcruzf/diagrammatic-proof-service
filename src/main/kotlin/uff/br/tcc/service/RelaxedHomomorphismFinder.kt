@@ -3,13 +3,14 @@ package uff.br.tcc.service
 import org.slf4j.LoggerFactory
 import uff.br.tcc.dto.Edge
 import uff.br.tcc.dto.HomomorphismValidatorRequest
+import uff.br.tcc.enum.Direction
 import uff.br.tcc.extensions.getEdgesWithSpecificNode
 
-abstract class RelaxedHomomorphismValidator {
+abstract class RelaxedHomomorphismFinder {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
-    abstract fun validate(homomorphismValidatorRequest: HomomorphismValidatorRequest): Boolean
+    abstract fun find(homomorphismValidatorRequest: HomomorphismValidatorRequest): Boolean
 
     protected fun isNodeImageToRightDiagramNode(
         homomorphismValidatorRequest: HomomorphismValidatorRequest,
@@ -17,19 +18,24 @@ abstract class RelaxedHomomorphismValidator {
         rightDiagramNodeName: String,
         edgesPath: List<Edge> = emptyList(),
     ) = isAllEdgesInSameNodeValid(
-        homomorphismValidatorRequest, rightDiagramNodeName, leftDiagramNodeName,
-        position = "LEFT", edgesPath
-    ) &&
-        isAllEdgesInSameNodeValid(
-            homomorphismValidatorRequest, rightDiagramNodeName, leftDiagramNodeName,
-            position = "RIGHT", edgesPath
-        )
+        homomorphismValidatorRequest = homomorphismValidatorRequest,
+        rightDiagramNodeName = rightDiagramNodeName,
+        leftDiagramNodeName = leftDiagramNodeName,
+        position = Direction.LEFT,
+        edgesPath = edgesPath
+    ) && isAllEdgesInSameNodeValid(
+        homomorphismValidatorRequest = homomorphismValidatorRequest,
+        rightDiagramNodeName = rightDiagramNodeName,
+        leftDiagramNodeName = leftDiagramNodeName,
+        position = Direction.RIGHT,
+        edgesPath = edgesPath
+    )
 
     private fun isAllEdgesInSameNodeValid(
         homomorphismValidatorRequest: HomomorphismValidatorRequest,
         rightDiagramNodeName: String,
         leftDiagramNodeName: String,
-        position: String,
+        position: Direction,
         edgesPath: List<Edge>,
     ): Boolean {
         val rightDiagramEdges = homomorphismValidatorRequest.rightDiagram.getEdgesWithSpecificNode(
@@ -69,18 +75,18 @@ abstract class RelaxedHomomorphismValidator {
         rightDiagramEdge: Edge,
         edgesPath: List<Edge>
     ): Boolean {
-        val possibleEdgeImages = getAllPossibleEdgeImages(
+        val possibleEdgeImage = getPossibleEdgeImage(
             homomorphismValidatorRequest, leftDiagramEdges,
             rightDiagramEdge, edgesPath
         )
-        return possibleEdgeImages.isNotEmpty()
+        return (possibleEdgeImage != null)
             .also { isNotEmpty ->
-                logger.debug(
-                    "Total of possible images for nodes in edge $rightDiagramEdge " +
-                        "is ${possibleEdgeImages.count()}"
-                )
                 if (isNotEmpty) {
-                    addImageInNodes(homomorphismValidatorRequest, rightDiagramEdge, possibleEdgeImages.first())
+                    logger.debug(
+                        "Possible image for nodes in edge $rightDiagramEdge " +
+                            "is ${possibleEdgeImage?.label?.name()}"
+                    )
+                    addImageInNodes(homomorphismValidatorRequest, rightDiagramEdge, possibleEdgeImage!!)
                 }
             }
     }
@@ -101,15 +107,15 @@ abstract class RelaxedHomomorphismValidator {
             }.imageName = edgeImage.rightNode.name
     }
 
-    protected open fun getAllPossibleEdgeImages(
+    protected open fun getPossibleEdgeImage(
         homomorphismValidatorRequest: HomomorphismValidatorRequest,
         leftDiagramEdges: List<Edge>,
         rightDiagramEdge: Edge,
         edgesPath: List<Edge>,
-    ): List<Edge> {
+    ): Edge? {
         val newEdgesPath = edgesPath.plus(rightDiagramEdge)
         logger.debug("Getting all possible images to edge $rightDiagramEdge with edges path $newEdgesPath.")
-        return leftDiagramEdges.filter { edge ->
+        return leftDiagramEdges.firstOrNull { edge ->
             logger.debug("Analysing if nodes in $edge is an option of image to nodes in $rightDiagramEdge.")
             edge.label.name() == rightDiagramEdge.label.name() &&
                 isNodeImageToRightDiagramNode(
