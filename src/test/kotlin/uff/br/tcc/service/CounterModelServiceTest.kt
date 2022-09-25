@@ -10,11 +10,11 @@ class CounterModelServiceTest {
 
     private val requestTransformer = RequestTransformer()
     private val diagramTransformer = DiagramTransformer()
-    private val homomorphismValidator = HomomorphismValidator()
+    private val homomorphismFinder = HomomorphismFinder()
     private val countermodelService = CountermodelService()
     private val hypothesisService = HypothesisService()
 
-    private val diagramService = DiagramService(diagramTransformer, requestTransformer, homomorphismValidator, countermodelService, hypothesisService)
+    private val diagramService = DiagramService(diagramTransformer, requestTransformer, homomorphismFinder, countermodelService, hypothesisService)
 
     @Test
     fun `should validate that inverse of R is included in itself`() {

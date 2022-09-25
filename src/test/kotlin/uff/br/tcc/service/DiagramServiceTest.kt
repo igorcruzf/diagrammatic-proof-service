@@ -19,11 +19,11 @@ class DiagramServiceTest {
 
     private val requestTransformer = RequestTransformer()
     private val diagramTransformer = DiagramTransformer()
-    private val homomorphismValidator = HomomorphismValidator()
+    private val homomorphismFinder = HomomorphismFinder()
     private val countermodelService = CountermodelService()
     private val hypothesisService = HypothesisService()
 
-    private val diagramService = DiagramService(diagramTransformer, requestTransformer, homomorphismValidator, countermodelService, hypothesisService)
+    private val diagramService = DiagramService(diagramTransformer, requestTransformer, homomorphismFinder, countermodelService, hypothesisService)
 
     @Test
     fun `should transform R intersection S in normal form`() {
@@ -67,11 +67,11 @@ class DiagramServiceTest {
     @Test
     fun `should transform expression in two diagrammatic proofs with normal diagrams and should be homomorphic in both directions`() {
         val expression = "(R comp S)int T inc ((R int(T comp (Sinv))) comp (((Rinv) comp T) int S)) int T"
-        val diagrammaticProofResponse = diagramService.transformDiagramsAndValidateHomomorphism(expression)
+        val diagrammaticProofResponse = diagramService.validateHomomorphism(expression)
         assertTrue(diagrammaticProofResponse.countermodel.isHomomorphic!!)
 
         val expression2 = "((R int(T comp (Sinv))) comp (((Rinv) comp T) int S)) int T inc (R comp S)int T"
-        val diagrammaticProofResponse2 = diagramService.transformDiagramsAndValidateHomomorphism(expression2)
+        val diagrammaticProofResponse2 = diagramService.validateHomomorphism(expression2)
         assertTrue(diagrammaticProofResponse2.countermodel.isHomomorphic!!)
     }
 
@@ -79,7 +79,7 @@ class DiagramServiceTest {
     fun `should apply hypothesis to transform in homomorphic diagrams when hypothesis is equal expression`() {
         val expression = "AcompB inc A"
         val hypothesis = listOf("AcompB inc A")
-        val diagrammaticProofResponse = diagramService.transformDiagramsAndValidateHomomorphism(expression, hypothesis)
+        val diagrammaticProofResponse = diagramService.validateHomomorphism(expression, hypothesis)
         assertTrue(diagrammaticProofResponse.countermodel.isHomomorphic!!)
     }
 
@@ -87,7 +87,7 @@ class DiagramServiceTest {
     fun `should apply multiple hypotheses to transform in homomorphic diagrams`() {
         val expression = "A inc B"
         val hypotheses = listOf("A inc C", "C inc D", "D inc E comp F", "E comp F inc B")
-        val diagrammaticProofResponse = diagramService.transformDiagramsAndValidateHomomorphism(expression, hypotheses)
+        val diagrammaticProofResponse = diagramService.validateHomomorphism(expression, hypotheses)
         assertTrue(diagrammaticProofResponse.countermodel.isHomomorphic!!)
     }
 
@@ -95,7 +95,7 @@ class DiagramServiceTest {
     fun `should apply multiple hypotheses to transform but doesnt find homomorphism`() {
         val expression = "A inc B"
         val hypotheses = listOf("A inc C", "C inc A")
-        val diagrammaticProofResponse = diagramService.transformDiagramsAndValidateHomomorphism(expression, hypotheses)
+        val diagrammaticProofResponse = diagramService.validateHomomorphism(expression, hypotheses)
         assertFalse(diagrammaticProofResponse.countermodel.isHomomorphic!!)
     }
 
@@ -103,7 +103,7 @@ class DiagramServiceTest {
     fun `should not apply hypotheses`() {
         val expression = "A inc B"
         val hypotheses = listOf("B inc C", "C inc D", "D inc E comp F", "E comp F inc B")
-        val diagrammaticProofResponse = diagramService.transformDiagramsAndValidateHomomorphism(expression, hypotheses)
+        val diagrammaticProofResponse = diagramService.validateHomomorphism(expression, hypotheses)
         assertFalse(diagrammaticProofResponse.countermodel.isHomomorphic!!)
     }
 

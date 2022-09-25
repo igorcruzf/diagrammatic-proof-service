@@ -20,5 +20,5 @@ class DiagrammaticProofController(
 
         @RequestParam(required = false, defaultValue = "")
         hypotheses: List<String>
-    ) = diagramService.transformDiagramsAndValidateHomomorphism(expression, hypotheses)
+    ) = diagramService.validateHomomorphism(expression, hypotheses)
 }

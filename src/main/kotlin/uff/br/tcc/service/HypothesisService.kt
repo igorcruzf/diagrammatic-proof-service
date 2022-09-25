@@ -11,10 +11,10 @@ import uff.br.tcc.dto.OUTPUT_NODE_NAME
 import uff.br.tcc.extensions.deepCopy
 
 @Service
-class HypothesisService : RelaxedHomomorphismValidator() {
+class HypothesisService : RelaxedHomomorphismFinder() {
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
-    override fun validate(homomorphismValidatorRequest: HomomorphismValidatorRequest): Boolean {
+    override fun find(homomorphismValidatorRequest: HomomorphismValidatorRequest): Boolean {
         logger.debug(
             "Validating leftDiagram ${homomorphismValidatorRequest.leftDiagram} and " +
                 "rightDiagram ${homomorphismValidatorRequest.rightDiagram}."
