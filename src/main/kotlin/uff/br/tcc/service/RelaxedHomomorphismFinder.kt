@@ -2,130 +2,93 @@ package uff.br.tcc.service
 
 import org.slf4j.LoggerFactory
 import uff.br.tcc.dto.Edge
-import uff.br.tcc.dto.HomomorphismValidatorRequest
-import uff.br.tcc.enum.Direction
-import uff.br.tcc.extensions.getEdgesWithSpecificNode
+import uff.br.tcc.dto.HomomorphismRequest
+import uff.br.tcc.dto.Node
 
 abstract class RelaxedHomomorphismFinder {
 
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
-    abstract fun find(homomorphismValidatorRequest: HomomorphismValidatorRequest): Boolean
+    abstract fun find(homomorphismRequest: HomomorphismRequest): Boolean
 
-    protected fun isNodeImageToRightDiagramNode(
-        homomorphismValidatorRequest: HomomorphismValidatorRequest,
-        leftDiagramNodeName: String,
-        rightDiagramNodeName: String,
-        edgesPath: List<Edge> = emptyList(),
-    ) = isAllEdgesInSameNodeValid(
-        homomorphismValidatorRequest = homomorphismValidatorRequest,
-        rightDiagramNodeName = rightDiagramNodeName,
-        leftDiagramNodeName = leftDiagramNodeName,
-        position = Direction.LEFT,
-        edgesPath = edgesPath
-    ) && isAllEdgesInSameNodeValid(
-        homomorphismValidatorRequest = homomorphismValidatorRequest,
-        rightDiagramNodeName = rightDiagramNodeName,
-        leftDiagramNodeName = leftDiagramNodeName,
-        position = Direction.RIGHT,
-        edgesPath = edgesPath
-    )
-
-    private fun isAllEdgesInSameNodeValid(
-        homomorphismValidatorRequest: HomomorphismValidatorRequest,
-        rightDiagramNodeName: String,
-        leftDiagramNodeName: String,
-        position: Direction,
+    protected fun find(
+        leftDiagramNode: Node,
+        rightDiagramNode: Node,
         edgesPath: List<Edge>,
+        homomorphismRequest: HomomorphismRequest
     ): Boolean {
-        val rightDiagramEdges = homomorphismValidatorRequest.rightDiagram.getEdgesWithSpecificNode(
-            nodeName = rightDiagramNodeName,
-            position = position
-        )
-        logger.debug("Right diagram edges in position $position with node $rightDiagramNodeName = $rightDiagramEdges.")
+        val isTailValid = isTailValid(homomorphismRequest, rightDiagramNode, edgesPath, leftDiagramNode)
 
-        val leftDiagramEdges = homomorphismValidatorRequest.leftDiagram.getEdgesWithSpecificNode(
-            nodeName = leftDiagramNodeName,
-            position = position
-        )
-        logger.debug("Left diagram edges in position $position with node $leftDiagramNodeName = $leftDiagramEdges.")
+        val isHeadValid = isHeadValid(homomorphismRequest, rightDiagramNode, edgesPath, leftDiagramNode)
 
-        val validEdges = rightDiagramEdges.filter { edge ->
-            edgesPath.contains(edge) ||
-                canMapEdgeToLeftDiagram(
-                    homomorphismValidatorRequest = homomorphismValidatorRequest,
-                    leftDiagramEdges = leftDiagramEdges,
-                    rightDiagramEdge = edge,
-                    edgesPath = edgesPath
-                )
-        }
-        logger.debug("Total of valid edges in a total of ${rightDiagramEdges.count()} is ${validEdges.count()}.")
-
-        return (validEdges == rightDiagramEdges).also {
-            if (!it) {
-                logger.debug("Total edges that was mapped with success = $validEdges")
-                logger.debug("Total edges in right diagram = $rightDiagramEdges")
+        return (isTailValid && isHeadValid).also { isValid ->
+            logger.info("Verified if ${leftDiagramNode.name} is image of ${rightDiagramNode.name}, result = $isValid")
+            if (isValid) {
+                homomorphismRequest.rightDiagram.nodes.first {
+                    it.name == rightDiagramNode.name
+                }.imageName = leftDiagramNode.name
             }
         }
     }
 
-    private fun canMapEdgeToLeftDiagram(
-        homomorphismValidatorRequest: HomomorphismValidatorRequest,
-        leftDiagramEdges: List<Edge>,
-        rightDiagramEdge: Edge,
-        edgesPath: List<Edge>
-    ): Boolean {
-        val possibleEdgeImage = getPossibleEdgeImage(
-            homomorphismValidatorRequest, leftDiagramEdges,
-            rightDiagramEdge, edgesPath
-        )
-        return (possibleEdgeImage != null)
-            .also { isNotEmpty ->
-                if (isNotEmpty) {
-                    logger.debug(
-                        "Possible image for nodes in edge $rightDiagramEdge " +
-                            "is ${possibleEdgeImage?.label?.name()}"
-                    )
-                    addImageInNodes(homomorphismValidatorRequest, rightDiagramEdge, possibleEdgeImage!!)
-                }
-            }
-    }
-
-    private fun addImageInNodes(
-        homomorphismValidatorRequest: HomomorphismValidatorRequest,
-        rightDiagramEdge: Edge,
-        edgeImage: Edge
-    ) {
-        logger.debug("Adding $rightDiagramEdge nodes image to nodes in $edgeImage.")
-        homomorphismValidatorRequest.rightDiagram.nodes
-            .first {
-                it.name == rightDiagramEdge.leftNode.name
-            }.imageName = edgeImage.leftNode.name
-        homomorphismValidatorRequest.rightDiagram.nodes
-            .first {
-                it.name == rightDiagramEdge.rightNode.name
-            }.imageName = edgeImage.rightNode.name
-    }
-
-    protected open fun getPossibleEdgeImage(
-        homomorphismValidatorRequest: HomomorphismValidatorRequest,
-        leftDiagramEdges: List<Edge>,
-        rightDiagramEdge: Edge,
+    private fun isTailValid(
+        homomorphismRequest: HomomorphismRequest,
+        rightDiagramNode: Node,
         edgesPath: List<Edge>,
-    ): Edge? {
-        val newEdgesPath = edgesPath.plus(rightDiagramEdge)
-        logger.debug("Getting all possible images to edge $rightDiagramEdge with edges path $newEdgesPath.")
-        return leftDiagramEdges.firstOrNull { edge ->
-            logger.debug("Analysing if nodes in $edge is an option of image to nodes in $rightDiagramEdge.")
-            edge.label.name() == rightDiagramEdge.label.name() &&
-                isNodeImageToRightDiagramNode(
-                    homomorphismValidatorRequest, edge.rightNode.name,
-                    rightDiagramEdge.rightNode.name, newEdgesPath
-                ) &&
-                isNodeImageToRightDiagramNode(
-                    homomorphismValidatorRequest, edge.leftNode.name,
-                    rightDiagramEdge.leftNode.name, newEdgesPath
+        leftDiagramNode: Node,
+    ) = homomorphismRequest.rightDiagram.edges.filter {
+        it.leftNode == rightDiagramNode &&
+            !edgesPath.contains(it)
+    }.map { rightEdge ->
+        getPossibleImagesFromTail(homomorphismRequest, leftDiagramNode, rightEdge)
+            .any {
+                find(
+                    leftDiagramNode = it.rightNode,
+                    rightDiagramNode = rightEdge.rightNode,
+                    edgesPath = edgesPath + rightEdge,
+                    homomorphismRequest = homomorphismRequest
                 )
+            }
+    }.reduceOrNull { acc, isEdgeValid ->
+        acc && isEdgeValid
+    } ?: true
+
+    private fun isHeadValid(
+        homomorphismRequest: HomomorphismRequest,
+        rightDiagramNode: Node,
+        edgesPath: List<Edge>,
+        leftDiagramNode: Node,
+    ) = homomorphismRequest.rightDiagram.edges.filter {
+        it.rightNode == rightDiagramNode &&
+            !edgesPath.contains(it)
+    }.map { rightEdge ->
+        getPossibleImagesFromHead(homomorphismRequest, leftDiagramNode, rightEdge).any {
+            find(
+                leftDiagramNode = it.leftNode,
+                rightDiagramNode = rightEdge.leftNode,
+                edgesPath = edgesPath + rightEdge,
+                homomorphismRequest = homomorphismRequest
+            )
         }
+    }.reduceOrNull { acc, isEdgeValid ->
+        acc && isEdgeValid
+    } ?: true
+
+    protected open fun getPossibleImagesFromTail(
+        homomorphismRequest: HomomorphismRequest,
+        leftDiagramNode: Node,
+        rightEdge: Edge,
+    ) = homomorphismRequest.leftDiagram.edges.filter {
+        it.leftNode == leftDiagramNode &&
+            it.label == rightEdge.label
+    }
+
+    protected open fun getPossibleImagesFromHead(
+        homomorphismRequest: HomomorphismRequest,
+        leftDiagramNode: Node,
+        rightEdge: Edge,
+    ) = homomorphismRequest.leftDiagram.edges.filter {
+        it.rightNode == leftDiagramNode &&
+            it.label == rightEdge.label
     }
 }

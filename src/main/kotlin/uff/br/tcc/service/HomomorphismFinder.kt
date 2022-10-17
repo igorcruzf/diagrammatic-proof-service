@@ -1,49 +1,40 @@
 package uff.br.tcc.service
 
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import uff.br.tcc.dto.Edge
-import uff.br.tcc.dto.HomomorphismValidatorRequest
+import uff.br.tcc.dto.HomomorphismRequest
+import uff.br.tcc.dto.Node
 import uff.br.tcc.enum.NodeTypeEnum
 
 @Component
 class HomomorphismFinder : RelaxedHomomorphismFinder() {
-    private val logger = LoggerFactory.getLogger(this.javaClass)
 
-    override fun find(homomorphismValidatorRequest: HomomorphismValidatorRequest): Boolean {
-        logger.info(
-            "Finding homomorphism in leftDiagram ${homomorphismValidatorRequest.leftDiagram} and " +
-                "rightDiagram ${homomorphismValidatorRequest.rightDiagram}."
+    override fun find(homomorphismRequest: HomomorphismRequest) =
+        find(
+            homomorphismRequest = homomorphismRequest,
+            leftDiagramNode = homomorphismRequest.leftDiagram.nodes.first(),
+            rightDiagramNode = homomorphismRequest.rightDiagram.nodes.first(),
+            edgesPath = listOf()
         )
 
-        return isNodeImageToRightDiagramNode(
-            homomorphismValidatorRequest,
-            homomorphismValidatorRequest.leftDiagram.nodes.first().name,
-            homomorphismValidatorRequest.rightDiagram.nodes.first().name
-        )
+    override fun getPossibleImagesFromTail(
+        homomorphismRequest: HomomorphismRequest,
+        leftDiagramNode: Node,
+        rightEdge: Edge,
+    ) = homomorphismRequest.leftDiagram.edges.filter {
+        it.leftNode == leftDiagramNode &&
+            it.label == rightEdge.label &&
+            isNodesTypeValid(rightEdge, it)
     }
 
-    override fun getPossibleEdgeImage(
-        homomorphismValidatorRequest: HomomorphismValidatorRequest,
-        leftDiagramEdges: List<Edge>,
-        rightDiagramEdge: Edge,
-        edgesPath: List<Edge>,
-    ): Edge? {
-        val newEdgesPath = edgesPath.plus(rightDiagramEdge)
-        logger.info("Getting one possible image to edge $rightDiagramEdge with edges path $newEdgesPath.")
-        return leftDiagramEdges.firstOrNull { edge ->
-            logger.info("Analysing if nodes in $edge is an option of image to nodes in $rightDiagramEdge.")
-            edge.label.name() == rightDiagramEdge.label.name() &&
-                isNodesTypeValid(rightDiagramEdge, edge) &&
-                isNodeImageToRightDiagramNode(
-                    homomorphismValidatorRequest, edge.rightNode.name,
-                    rightDiagramEdge.rightNode.name, newEdgesPath
-                ) &&
-                isNodeImageToRightDiagramNode(
-                    homomorphismValidatorRequest, edge.leftNode.name,
-                    rightDiagramEdge.leftNode.name, newEdgesPath
-                )
-        }
+    override fun getPossibleImagesFromHead(
+        homomorphismRequest: HomomorphismRequest,
+        leftDiagramNode: Node,
+        rightEdge: Edge,
+    ) = homomorphismRequest.leftDiagram.edges.filter {
+        it.rightNode == leftDiagramNode &&
+            it.label == rightEdge.label &&
+            isNodesTypeValid(rightEdge, it)
     }
 
     private fun isNodesTypeValid(

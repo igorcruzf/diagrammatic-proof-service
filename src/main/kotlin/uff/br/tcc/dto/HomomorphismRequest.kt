@@ -1,6 +1,6 @@
 package uff.br.tcc.dto
 
-data class HomomorphismValidatorRequest(
+data class HomomorphismRequest(
     val leftDiagram: Diagram,
     val rightDiagram: Diagram
 )

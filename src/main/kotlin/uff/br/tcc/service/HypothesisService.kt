@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service
 import uff.br.tcc.dto.Diagram
 import uff.br.tcc.dto.DiagrammaticProof
 import uff.br.tcc.dto.Edge
-import uff.br.tcc.dto.HomomorphismValidatorRequest
+import uff.br.tcc.dto.HomomorphismRequest
 import uff.br.tcc.dto.INPUT_NODE_NAME
 import uff.br.tcc.dto.OUTPUT_NODE_NAME
 import uff.br.tcc.extensions.deepCopy
@@ -14,17 +14,18 @@ import uff.br.tcc.extensions.deepCopy
 class HypothesisService : RelaxedHomomorphismFinder() {
     private val logger = LoggerFactory.getLogger(this.javaClass)
 
-    override fun find(homomorphismValidatorRequest: HomomorphismValidatorRequest): Boolean {
+    override fun find(homomorphismRequest: HomomorphismRequest): Boolean {
         logger.debug(
-            "Validating leftDiagram ${homomorphismValidatorRequest.leftDiagram} and " +
-                "rightDiagram ${homomorphismValidatorRequest.rightDiagram}."
+            "Validating leftDiagram ${homomorphismRequest.leftDiagram} and " +
+                "rightDiagram ${homomorphismRequest.rightDiagram}."
         )
 
-        return homomorphismValidatorRequest.leftDiagram.nodes.any {
-            isNodeImageToRightDiagramNode(
-                homomorphismValidatorRequest,
-                it.name,
-                homomorphismValidatorRequest.rightDiagram.nodes.first().name
+        return homomorphismRequest.leftDiagram.nodes.any {
+            find(
+                homomorphismRequest = homomorphismRequest,
+                leftDiagramNode = it,
+                rightDiagramNode = homomorphismRequest.rightDiagram.nodes.first(),
+                edgesPath = listOf()
             )
         }
     }

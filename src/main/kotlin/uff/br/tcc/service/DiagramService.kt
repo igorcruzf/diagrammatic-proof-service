@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service
 import uff.br.tcc.dto.CountermodelResponse
 import uff.br.tcc.dto.DiagrammaticProof
 import uff.br.tcc.dto.DiagrammaticProofResponse
-import uff.br.tcc.dto.HomomorphismValidatorRequest
+import uff.br.tcc.dto.HomomorphismRequest
 import uff.br.tcc.extensions.deepCopy
 import uff.br.tcc.extensions.hasAnyNonAtomicTerm
 import uff.br.tcc.transformer.DiagramTransformer
@@ -32,7 +32,7 @@ class DiagramService(
 
         if (countermodelResponse.isHomomorphic!!) {
             homomorphismFinder.find(
-                HomomorphismValidatorRequest(
+                HomomorphismRequest(
                     leftDiagram = leftDiagrammaticProof.diagrams.last(),
                     rightDiagram = rightDiagrammaticProof.diagrams.last()
                 )
@@ -63,7 +63,7 @@ class DiagramService(
 
         return if (hypothesesResponse != null) {
             homomorphismFinder.find(
-                HomomorphismValidatorRequest(
+                HomomorphismRequest(
                     leftDiagram = hypothesesResponse.first.diagrams.last(),
                     rightDiagram = rightDiagrammaticProof.diagrams.last()
                 )
@@ -128,7 +128,7 @@ class DiagramService(
             diagrammaticProofsToApplyHypothesis = diagrammaticProofsToApplyHypothesis.map {
                 normalizedHypotheses.mapNotNull { (leftHypothesis, rightHypothesis) ->
                     val isHypothesisApplicable = hypothesisService.find(
-                        HomomorphismValidatorRequest(
+                        HomomorphismRequest(
                             leftDiagram = it.diagrams.last(),
                             rightDiagram = leftHypothesis.diagrams.last()
                         )
