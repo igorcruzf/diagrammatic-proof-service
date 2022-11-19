@@ -130,8 +130,9 @@ class DiagramService(
                     )
 
                     if (isHypothesisApplicable) {
-                        val newLeftDiagrammaticProof = applyHypothesis(
-                            diagrammaticProof = it,
+
+                        val newLeftDiagrammaticProof = applyHypothesisInLeftDiagrammaticProof(
+                            it,
                             leftHypothesis,
                             rightHypothesis
                         )
@@ -156,20 +157,7 @@ class DiagramService(
         return null
     }
 
-    private fun applyHypothesis(
-        diagrammaticProof: DiagrammaticProof,
-        leftHypothesis: DiagrammaticProof,
-        rightHypothesis: DiagrammaticProof
-    ): DiagrammaticProof {
-
-        return createNewLeftDiagrammaticProof(
-            diagrammaticProof,
-            leftHypothesis,
-            rightHypothesis
-        )
-    }
-
-    private fun createNewLeftDiagrammaticProof(
+    private fun applyHypothesisInLeftDiagrammaticProof(
         leftDiagrammaticProof: DiagrammaticProof,
         leftHypothesis: DiagrammaticProof,
         rightHypothesis: DiagrammaticProof,

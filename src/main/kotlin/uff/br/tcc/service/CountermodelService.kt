@@ -23,14 +23,16 @@ class CountermodelService {
         var leftRelations = countermodel.relations
         for (diagram in leftDiagrammaticProof.diagrams.reversed()) {
             leftRelations = applyOperation(diagram, leftRelations)
-            diagram.countermodelRelations = leftRelations
         }
+
+        leftDiagrammaticProof.diagrams.first().countermodelRelations = leftRelations
 
         var rightRelations = countermodel.relations
         for (diagram in rightDiagrammaticProof.diagrams.reversed()) {
             rightRelations = applyOperation(diagram, rightRelations)
-            diagram.countermodelRelations = rightRelations
         }
+
+        rightDiagrammaticProof.diagrams.first().countermodelRelations = rightRelations
 
         countermodel.isHomomorphic = isHomomorphic(
             leftRelations, leftDiagrammaticProof, rightRelations, rightDiagrammaticProof

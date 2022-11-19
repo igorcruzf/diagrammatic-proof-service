@@ -10,12 +10,20 @@ import java.util.stream.Collectors
 
 fun DiagrammaticProof.deepCopy(): DiagrammaticProof {
     val gson = buildGson()
-    return gson.fromJson(gson.toJson(this), this::class.java)
+    val counterModelRelations = diagrams.first().countermodelRelations
+    return gson.fromJson(gson.toJson(this), this::class.java).also {
+        it.diagrams.first().let { diagram ->
+            diagram.countermodelRelations = counterModelRelations
+        }
+    }
 }
 
 fun Diagram.deepCopy(): Diagram {
     val gson = buildGson()
-    return gson.fromJson(gson.toJson(this), this::class.java)
+    val copyCounterModelRelations = countermodelRelations
+    val newDiagram = gson.fromJson(gson.toJson(this), this::class.java)
+    newDiagram.countermodelRelations = copyCounterModelRelations
+    return newDiagram
 }
 
 fun ITerm.deepCopy(): ITerm {
