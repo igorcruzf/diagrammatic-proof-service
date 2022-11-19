@@ -61,15 +61,10 @@ class DiagramService(
             rightDiagrammaticProof = rightDiagrammaticProof
         )
 
-        return if (hypothesesResponse != null) {
-            homomorphismFinder.find(
-                HomomorphismRequest(
-                    leftDiagram = hypothesesResponse.first.diagrams.last(),
-                    rightDiagram = rightDiagrammaticProof.diagrams.last()
-                )
-            )
-            buildProofResponse(hypothesesResponse.second, hypothesesResponse.first, rightDiagrammaticProof)
-        } else buildProofResponse(countermodelResponse, leftDiagrammaticProof, rightDiagrammaticProof)
+        return hypothesesResponse?.let {
+            countermodelResponse.isHomomorphic = true
+            buildProofResponse(countermodelResponse, hypothesesResponse, rightDiagrammaticProof)
+        } ?: buildProofResponse(countermodelResponse, leftDiagrammaticProof, rightDiagrammaticProof)
     }
 
     private fun transformDiagrams(diagramsRequest: String): Pair<DiagrammaticProof, DiagrammaticProof> {
@@ -118,7 +113,7 @@ class DiagramService(
         hypotheses: List<String>,
         leftDiagrammaticProof: DiagrammaticProof,
         rightDiagrammaticProof: DiagrammaticProof
-    ): Pair<DiagrammaticProof, CountermodelResponse>? {
+    ): DiagrammaticProof? {
         var diagrammaticProofsToApplyHypothesis = listOf(leftDiagrammaticProof)
 
         val normalizedHypotheses = normalizeHypotheses(hypotheses)
@@ -135,16 +130,22 @@ class DiagramService(
                     )
 
                     if (isHypothesisApplicable) {
-                        val (newLeftDiagrammaticProof, countermodelResponse) = applyHypothesis(
+                        val newLeftDiagrammaticProof = applyHypothesis(
                             diagrammaticProof = it,
                             leftHypothesis,
-                            rightHypothesis,
-                            rightDiagrammaticProof
+                            rightHypothesis
                         )
 
-                        if (countermodelResponse.isHomomorphic!!) {
+                        val isHomomorphic = homomorphismFinder.find(
+                            HomomorphismRequest(
+                                newLeftDiagrammaticProof.diagrams.last(),
+                                rightDiagrammaticProof.diagrams.last()
+                            )
+                        )
+
+                        if (isHomomorphic) {
                             logger.info("Found homomorphism with hypotheses")
-                            return Pair(newLeftDiagrammaticProof, countermodelResponse)
+                            return newLeftDiagrammaticProof
                         } else {
                             newLeftDiagrammaticProof
                         }
@@ -158,19 +159,14 @@ class DiagramService(
     private fun applyHypothesis(
         diagrammaticProof: DiagrammaticProof,
         leftHypothesis: DiagrammaticProof,
-        rightHypothesis: DiagrammaticProof,
-        rightDiagrammaticProof: DiagrammaticProof,
-    ): Pair<DiagrammaticProof, CountermodelResponse> {
-        val newLeftDiagrammaticProof = createNewLeftDiagrammaticProof(
+        rightHypothesis: DiagrammaticProof
+    ): DiagrammaticProof {
+
+        return createNewLeftDiagrammaticProof(
             diagrammaticProof,
             leftHypothesis,
             rightHypothesis
         )
-
-        val countermodelResponse = countermodelService.createCountermodel(
-            newLeftDiagrammaticProof, rightDiagrammaticProof
-        )
-        return Pair(newLeftDiagrammaticProof, countermodelResponse)
     }
 
     private fun createNewLeftDiagrammaticProof(

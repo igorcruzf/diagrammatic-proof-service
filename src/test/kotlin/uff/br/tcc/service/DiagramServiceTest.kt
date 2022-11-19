@@ -91,7 +91,15 @@ class DiagramServiceTest {
         assertTrue(diagrammaticProofResponse.countermodel.isHomomorphic!!)
     }
 
-//    @Test
+    @Test
+    fun `should apply hypothesis to transform in homomorphic diagrams when hypothesis is equal expression with variable on the left side`() {
+        val expression = "R inc (R comp S) int (R comp T)"
+        val hypothesis = listOf("R inc (R comp S) int (R comp T)")
+        val diagrammaticProofResponse = diagramService.validateHomomorphism(expression, hypothesis)
+        assertTrue(diagrammaticProofResponse.countermodel.isHomomorphic!!)
+    }
+
+    @Test
     fun `should apply multiple hypotheses to transform but doesnt find homomorphism`() {
         val expression = "A inc B"
         val hypotheses = listOf("A inc C", "C inc A")

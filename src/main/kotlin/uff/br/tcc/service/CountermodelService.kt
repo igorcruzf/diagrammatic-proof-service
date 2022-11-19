@@ -51,9 +51,28 @@ class CountermodelService {
             node.name to index
         }.toMap()
 
-        val relations = leftNormalFormDiagram.edges.map { (it.label as AtomicTerm).name }.distinct()
+        val initialRelations = initializeRelations(leftNormalFormDiagram, rightNormalFormDiagram, universeVariables)
 
-        val initialRelations = relations.associateWith { relation ->
+        logger.debug(
+            "Universe of countermodel = ${universeVariables.values}, relations = $initialRelations, " +
+                "for diagram with initial label = ${leftDiagrammaticProof.diagrams.first().edges.first().label.name()}"
+        )
+
+        return CountermodelResponse(
+            universeVariables,
+            initialRelations
+        )
+    }
+
+    private fun initializeRelations(
+        leftNormalFormDiagram: Diagram,
+        rightNormalFormDiagram: Diagram,
+        universeVariables: Map<String, Int>,
+    ): Map<String, List<Pair<Int, Int>>> {
+
+        val relationsName = leftNormalFormDiagram.edges.map { (it.label as AtomicTerm).name }.distinct()
+
+        val relations = relationsName.associateWith { relation ->
             leftNormalFormDiagram.edges.filter {
                 it.label.name() == relation
             }.map {
@@ -62,26 +81,16 @@ class CountermodelService {
         }.toMap()
 
         val rightRelations = rightNormalFormDiagram.edges.map { (it.label as AtomicTerm).name }.distinct().filter {
-            !relations.contains(it)
+            !relationsName.contains(it)
         }
 
-        val allInitialRelations = if (rightRelations.isEmpty()) {
-            initialRelations
+        return if (rightRelations.isEmpty()) {
+            relations
         } else {
-            initialRelations + rightRelations.map {
+            relations + rightRelations.map {
                 it to listOf(EMPTY_SET_VALUE to EMPTY_SET_VALUE)
             }
         }
-
-        logger.debug(
-            "Universe of countermodel = ${universeVariables.values}, relations = $allInitialRelations, " +
-                "for diagram with initial label = ${leftDiagrammaticProof.diagrams.first().edges.first().label.name()}"
-        )
-
-        return CountermodelResponse(
-            universeVariables,
-            allInitialRelations
-        )
     }
 
     private fun isHomomorphic(
@@ -162,11 +171,7 @@ class CountermodelService {
         }
 
     fun Map<String, List<Pair<Int, Int>>>.getOrEmptySet(label: String): List<Pair<Int, Int>> {
-        return if (this[label] == null) {
-            listOf(EMPTY_SET_VALUE to EMPTY_SET_VALUE)
-        } else {
-            this[label]!!
-        }
+        return this[label] ?: listOf(EMPTY_SET_VALUE to EMPTY_SET_VALUE)
     }
 
     companion object {

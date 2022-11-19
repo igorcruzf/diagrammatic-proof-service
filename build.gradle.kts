@@ -37,6 +37,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation(group = "com.google.code.gson", name = "gson", version = "2.7")
+    implementation("org.springdoc:springdoc-openapi-ui:1.6.9")
+    implementation("org.springdoc:springdoc-openapi-kotlin:1.6.9")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test:2.6.7")
 }
