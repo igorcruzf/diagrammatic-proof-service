@@ -1,7 +1,9 @@
 ## Objetivo
-Essa API implementa um procedimento de decisão para validade de inclusões no fragmento geométrico de BGL (Basic Graph Logic).
+Essa API implementa um procedimento de decisão para validade e consequência de inclusões no fragmento geométrico de BGL (Basic Graph Logic).
 
 Dado uma inclusão entre grafos de GeoBGL, o procedimento coloca os grafos em forma normal e verifica se há homomorfismo entre eles.
+
+[Visualize o Projeto de Front-End aqui!](https://github.com/igorcruzf/diagrammatic-proof-frontend)
 
 ## Como executar o projeto localmente
 
@@ -88,4 +90,3 @@ O objeto "countermodel" tem:
    - associa pares de variáveis do universo deste contramodelo para cada rótulo da forma normal do diagrama à esquerda
    - associa o par (-1, -1) para representar o conjunto vazio quando o rótulo está presente apenas no diagrama da direita
    - associa pares para aplicações de operações em cima das relações, utilizando os pares descritos acima.
-
