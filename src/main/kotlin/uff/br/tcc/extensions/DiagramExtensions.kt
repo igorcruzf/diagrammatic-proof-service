@@ -12,9 +12,10 @@ fun DiagrammaticProof.deepCopy(): DiagrammaticProof {
     val gson = buildGson()
     val counterModelRelations = diagrams.first().countermodelRelations
     return gson.fromJson(gson.toJson(this), this::class.java).also {
-        it.diagrams.first().let { diagram ->
-            diagram.countermodelRelations = counterModelRelations
+        it.diagrams.forEachIndexed { index, diagram ->
+            diagram.countermodelRelations = this.diagrams[index].countermodelRelations
         }
+        it.diagrams.first().countermodelRelations = counterModelRelations
     }
 }
 

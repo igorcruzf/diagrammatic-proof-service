@@ -108,6 +108,14 @@ class DiagramServiceTest {
     }
 
     @Test
+    fun `should apply multiple hypotheses to transform and find homomorphism`() {
+        val expression = "A inc B"
+        val hypotheses = listOf("A inc C", "C inc B")
+        val diagrammaticProofResponse = diagramService.validateHomomorphism(expression, hypotheses)
+        assertTrue(diagrammaticProofResponse.countermodel.isHomomorphic!!)
+    }
+
+    @Test
     fun `should not apply hypotheses`() {
         val expression = "A inc B"
         val hypotheses = listOf("B inc C", "C inc D", "D inc E comp F", "E comp F inc B")
