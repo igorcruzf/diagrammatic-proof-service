@@ -1,15 +1,35 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+repositories {
+    gradlePluginPortal()
+    mavenCentral()
+}
+
+buildscript {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("io.spring.gradle:dependency-management-plugin:1.0.11.RELEASE")
+        classpath("org.jlleitschuh.gradle:ktlint-gradle:10.3.0")
+        classpath("io.gitlab.arturbosch.detekt:1.20.0")
+        classpath("plugin.spring:1.6.21")
+
+    }
+}
+
+apply(plugin = "io.spring.dependency-management")
+apply(plugin = "org.jlleitschuh.gradle.ktlint")
+apply(plugin = "io.gitlab.arturbosch.detekt")
+apply(plugin = "plugin.spring")
+
 plugins {
     java
     application
     id("org.springframework.boot") version "2.6.6"
-    id("io.spring.dependency-management") version "1.0.11.RELEASE"
-    id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
-    id("io.gitlab.arturbosch.detekt") version "1.20.0"
 
     kotlin("jvm") version "1.6.21"
-    kotlin("plugin.spring") version "1.6.21"
 }
 
 application {
@@ -22,9 +42,7 @@ group = "com.br.uff"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
-repositories {
-    mavenCentral()
-}
+
 
 detekt {
     config = files("config/detekt/detekt.yml")
